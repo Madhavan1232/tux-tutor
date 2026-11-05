@@ -46,7 +46,6 @@ function createRateLimiter({ windowMs = 10 * 60 * 1000, max = 5, message = 'Too 
 }
 
 module.exports = {
-  createRateLimiter,
   emailCheckLimiter: createRateLimiter({
     windowMs: 60 * 1000,
     max: 5,

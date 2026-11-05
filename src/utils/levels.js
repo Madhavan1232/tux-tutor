@@ -16,7 +16,7 @@ const LEVEL_TIERS = [
  * @param {number} level
  * @returns {string}
  */
-export function levelTitle(level) {
+function levelTitle(level) {
   const tier = LEVEL_TIERS.find((t) => level >= t.min && level <= t.max);
   return tier ? tier.title : 'Egg';
 }

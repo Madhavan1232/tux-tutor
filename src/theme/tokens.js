@@ -7,17 +7,6 @@ import { colors } from './colors';
 
 export { colors };
 
-export const COLORS = {
-  background:    colors.bg.base,
-  primary:       colors.accent.default,
-  surface:       colors.bg.surface,
-  secondaryRed:  colors.accent.hover,
-  darkBurgundy:  colors.accent.muted,
-  deepRed:       colors.accent.muted,
-  textPrimary:   colors.text.primary,
-  textSecondary: colors.text.secondary,
-};
-
 export const WORLDS = [
   {
     id: 1,
