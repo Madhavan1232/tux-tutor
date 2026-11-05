@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './components/auth/AuthPage';
 import ResetPasswordPage from './components/auth/ResetPasswordPage';
-import HomePage from './components/home/HomePage';
 import DashboardPage from './features/dashboard/DashboardPage';
 import AppShell from './components/layout/AppShell';
 import tuxLogo from './assets/logo.png';
@@ -169,10 +168,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route
-          path="/terminal"
-          element={<HomePage user={currentUser} onSignOut={handleSignOut} />}
-        />
+        <Route path="/terminal" element={<Placeholder title="Terminal" />} />
         <Route path="/badges" element={<Placeholder title="Badges" />} />
         <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
         <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />

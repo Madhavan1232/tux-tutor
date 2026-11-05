@@ -538,7 +538,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 <section className="apple-brand-panel">
                     <div className="apple-brand-content">
                         <div className="apple-brand-hero">
-                            <span className="apple-eyebrow">LEARN BY DOING · FREE TO START</span>
+                            <span className="apple-eyebrow">{"LEARN BY DOING \u00B7 FREE TO START"}</span>
                             
                             {/* Apple's Mixed-Weight Headline Trick */}
                             <h1 className="apple-display-headline">
@@ -1191,7 +1191,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 .apple-brand-panel {
                     flex: 0 0 50%;
                     max-width: 50%;
-                    padding: 20px 48px;
+                    padding: 20px 40px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -1204,7 +1204,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     display: flex;
                     flex-direction: column;
                     gap: 14px;
-                    max-width: 500px;
+                    max-width: 560px;
                     width: 100%;
                 }
 
@@ -1217,10 +1217,11 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 /* Display Heading with Apple Mixed-Weight Trick */
                 .apple-display-headline {
                     font-family: var(--font-display) !important;
-                    font-size: clamp(34px, 3.6vw, 44px) !important;
+                    font-size: clamp(26px, 2.7vw, 38px) !important;
                     line-height: 1.15 !important;
                     letter-spacing: -0.025em !important;
                     margin: 0 !important;
+                    white-space: nowrap !important;
                 }
 
                 .apple-display-headline span {
@@ -1742,6 +1743,9 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
 
                 /* Responsive Breakpoints */
                 @media (max-width: 960px) {
+                    .apple-display-headline {
+                        white-space: normal !important;
+                    }
                     .apple-auth-stage {
                         height: auto;
                         min-height: 100vh;

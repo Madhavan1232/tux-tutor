@@ -185,7 +185,7 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                 <section className="apple-brand-panel">
                     <div className="apple-brand-content">
                         <div className="apple-brand-hero">
-                            <span className="apple-eyebrow">ACCOUNT RECOVERY · SECURE RESET</span>
+                            <span className="apple-eyebrow">{"ACCOUNT RECOVERY \u00B7 SECURE RESET"}</span>
                             <h1 className="apple-display-headline">
                                 <span className="headline-accent">Learn Linux.</span>
                                 <span className="headline-rest"> The right way.</span>
@@ -541,7 +541,7 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                 .apple-brand-panel {
                     flex: 0 0 50%;
                     max-width: 50%;
-                    padding: 24px 60px;
+                    padding: 20px 40px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -553,8 +553,8 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                 .apple-brand-content {
                     display: flex;
                     flex-direction: column;
-                    gap: 16px;
-                    max-width: 520px;
+                    gap: 14px;
+                    max-width: 560px;
                     width: 100%;
                 }
 
@@ -565,21 +565,29 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                 }
 
                 .apple-display-headline {
-                    font-family: var(--font-display);
-                    font-size: clamp(34px, 3.8vw, 48px);
-                    line-height: 1.08;
-                    letter-spacing: var(--tracking-display);
-                    margin: 0;
+                    font-family: var(--font-display) !important;
+                    font-size: clamp(26px, 2.7vw, 38px) !important;
+                    line-height: 1.15 !important;
+                    letter-spacing: -0.025em !important;
+                    margin: 0 !important;
+                    white-space: nowrap !important;
+                }
+
+                .apple-display-headline span {
+                    font-size: inherit !important;
+                    line-height: inherit !important;
+                    letter-spacing: inherit !important;
+                    display: inline !important;
                 }
 
                 .headline-accent {
-                    color: var(--color-accent);
-                    font-weight: 700;
+                    color: #DC2626 !important;
+                    font-weight: 700 !important;
                 }
 
                 .headline-rest {
-                    color: var(--color-text-primary);
-                    font-weight: 300;
+                    color: var(--color-text-primary) !important;
+                    font-weight: 700 !important;
                 }
 
                 .apple-body-lead {
@@ -924,6 +932,9 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                 }
 
                 @media (max-width: 960px) {
+                    .apple-display-headline {
+                        white-space: normal !important;
+                    }
                     .apple-auth-stage {
                         height: auto;
                         min-height: 100vh;
