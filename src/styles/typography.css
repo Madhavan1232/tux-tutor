@@ -125,7 +125,7 @@ h3, .apple-h3 {
 .apple-eyebrow {
   font-family: var(--font-display);
   font-size: var(--text-eyebrow);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--color-accent); /* Crimson #DC2626 */
@@ -150,6 +150,11 @@ small, .apple-caption {
 }
 
 /* Apple Mixed-Weight Headline Trick */
+h1 span, h2 span, h3 span, .apple-display span, .apple-display-headline span {
+  font-size: inherit;
+  line-height: inherit;
+}
+
 .headline-accent {
   color: var(--color-accent); /* #DC2626 */
   font-weight: var(--weight-bold); /* 700 */
@@ -157,17 +162,18 @@ small, .apple-caption {
 
 .headline-rest {
   color: var(--color-text-primary); /* #1D1D1F */
-  font-weight: var(--weight-light); /* 300 */
+  font-weight: var(--weight-bold); /* 700 */
 }
 
 /* Apple Buttons */
+button.apple-btn-primary,
 .apple-btn-primary {
   background-color: var(--color-accent);
   color: #FFFFFF;
   font-family: var(--font-body);
-  font-size: 17px;
-  font-weight: var(--weight-regular); /* Apple buttons are NOT bold */
-  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: var(--weight-semibold);
+  padding: 13px 24px;
   border-radius: var(--radius-pill); /* 980px pill */
   letter-spacing: 0;
   border: none;
@@ -180,8 +186,15 @@ small, .apple-caption {
   transition: opacity 0.2s var(--ease-apple), background-color 0.2s var(--ease-apple);
 }
 
+button.apple-btn-primary:hover:not(:disabled),
 .apple-btn-primary:hover:not(:disabled) {
   background-color: var(--color-accent-hover);
+}
+
+button.apple-btn-primary:disabled,
+.apple-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .apple-btn-secondary {
@@ -208,10 +221,12 @@ small, .apple-caption {
 }
 
 /* Apple Link Style */
+button.apple-link,
 .apple-link {
   color: var(--color-accent); /* #DC2626 */
   text-decoration: none;
   font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
   background: transparent;
   border: none;
   padding: 0;

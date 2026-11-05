@@ -202,14 +202,10 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 if (data.isUnverified || data.status === "UNVERIFIED") {
                     setEmailExistsState("UNVERIFIED")
                 } else {
-                    setEmailExistsState(null)
-                    setMode("login")
-                    setLoginNotice("An account with this email already exists. Sign in →")
-                    setPassword("")
-                    setError("")
+                    setEmailExistsState("EXISTS")
                     setShowPasswordField(true)
                     setTimeout(() => {
-                        loginPasswordInputRef.current?.focus()
+                        signupPasswordInputRef.current?.focus()
                     }, 250)
                 }
                 return false
@@ -384,6 +380,11 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
         e.preventDefault()
         setError("")
 
+        if (emailExistsState === "EXISTS") {
+            setError("An account with this email already exists. Please sign in.")
+            return
+        }
+
         const cleanEmail = email.trim().toLowerCase()
         if (!cleanEmail || !EMAIL_REGEX.test(cleanEmail)) {
             setError("Please enter a valid email address.")
@@ -524,7 +525,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                         <span className="apple-brand-name">TUX TUTOR</span>
                     </div>
                     <div className="apple-header-badge">
-                        <span className="apple-eyebrow">Linux Learning Platform</span>
+                        <span className="apple-eyebrow">LINUX LEARNING PLATFORM</span>
                     </div>
                 </div>
             </header>
@@ -537,16 +538,16 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 <section className="apple-brand-panel">
                     <div className="apple-brand-content">
                         <div className="apple-brand-hero">
-                            <span className="apple-eyebrow">LEARN BY DOING · FREE TO START</span>
+                            <span className="apple-eyebrow">INTERACTIVE LINUX SANDBOX</span>
                             
                             {/* Apple's Mixed-Weight Headline Trick */}
                             <h1 className="apple-display-headline">
-                                <span className="headline-accent">Learn Linux.</span>
-                                <span className="headline-rest"> The right way.</span>
+                                <span className="headline-accent">Learn Linux.</span>{" "}
+                                <span className="headline-rest">The right way.</span>
                             </h1>
 
                             <p className="apple-body-lead">
-                                Hands-on labs, guided paths, and real terminal practice — from complete beginner to production-ready developer. Perfect for CS students, developers switching to Linux, and anyone who learns best by doing.
+                                Hands-on labs, guided paths, and real terminal practice — from beginner to kernel contributor.
                             </p>
                         </div>
 
@@ -611,7 +612,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     <span className="term-dot dot-yellow" />
                                     <span className="term-dot dot-green" />
                                 </div>
-                                <span className="apple-terminal-label">Your sandbox, live in seconds:</span>
+                                <span className="apple-terminal-label">bash — lab-sandbox-01</span>
                             </div>
                             <pre className="apple-terminal-code">
                                 <span className="t-prompt">$</span> tux lab start linux-fundamentals{'\n'}
@@ -642,7 +643,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     className="apple-auth-card"
                                 >
                                     <div className="apple-card-header">
-                                        <span className="apple-eyebrow">Welcome Back</span>
+                                        <span className="apple-eyebrow">WELCOME BACK</span>
                                         <h2 className="apple-card-title">Sign in to TUX TUTOR</h2>
                                     </div>
 
@@ -801,10 +802,10 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     className="apple-auth-card"
                                 >
                                     <div className="apple-card-header">
-                                        <span className="apple-eyebrow">JOIN FREE</span>
+                                        <span className="apple-eyebrow">GET STARTED</span>
                                         <h2 className="apple-card-title">Create your account</h2>
                                         <p className="apple-body" style={{ margin: "4px 0 0 0" }}>
-                                            Get instant access to your Linux sandbox.
+                                            Start your Linux journey with hands-on practice.
                                         </p>
                                     </div>
 
@@ -814,6 +815,28 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                                             </svg>
                                             <span>{error}</span>
+                                        </div>
+                                    )}
+
+                                    {emailExistsState === "EXISTS" && (
+                                        <div className="apple-alert-box apple-alert-warning" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FEF2F2', border: '0.5px solid #FECACA', borderRadius: '14px', padding: '12px 16px', marginBottom: '14px' }}>
+                                            <div className="apple-dup-text" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                <strong style={{ fontWeight: 600, color: '#1D1D1F', fontSize: '13.5px' }}>Account already exists</strong>
+                                                <span className="apple-caption" style={{ color: '#6E6E73', fontSize: '12.5px' }}>An account with this email is already registered.</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setMode("login")
+                                                    setShowPasswordField(true)
+                                                    setPassword("")
+                                                    setError("")
+                                                }}
+                                                className="apple-btn-primary apple-caption"
+                                                style={{ padding: '8px 18px', height: 'auto', fontSize: '13.5px', borderRadius: '9999px', whiteSpace: 'nowrap' }}
+                                            >
+                                                Sign In →
+                                            </button>
                                         </div>
                                     )}
 
@@ -896,7 +919,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                                     setPassword(e.target.value)
                                                                     if (error) setError("")
                                                                 }}
-                                                                placeholder="At least 8 characters"
+                                                                placeholder="Create a strong password"
                                                                 autoComplete="new-password"
                                                                 required
                                                                 className="apple-input has-toggle"
@@ -963,7 +986,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
 
                                         <button
                                             type="submit"
-                                            disabled={loading || emailExistsState === "EXISTS" || isCheckingEmail}
+                                            disabled={loading || isCheckingEmail}
                                             className="apple-btn-primary full-width"
                                         >
                                             {!showPasswordField ? (
@@ -981,7 +1004,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                     <span>Creating account...</span>
                                                 </>
                                             ) : (
-                                                "Create free account"
+                                                "Create account"
                                             )}
                                         </button>
                                     </form>
@@ -1200,14 +1223,19 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     margin: 0;
                 }
 
+                .apple-display-headline span {
+                    font-size: inherit !important;
+                    line-height: inherit !important;
+                }
+
                 .headline-accent {
-                    color: var(--color-accent); /* #DC2626 */
-                    font-weight: 700;
+                    color: #DC2626 !important; /* Crimson Red */
+                    font-weight: 700 !important;
                 }
 
                 .headline-rest {
-                    color: var(--color-text-primary); /* #1D1D1F */
-                    font-weight: 300; /* Apple's 300 light weight */
+                    color: var(--color-text-primary) !important; /* #1D1D1F */
+                    font-weight: 700 !important; /* Crisp bold matching design */
                 }
 
                 .apple-body-lead {
@@ -1350,21 +1378,24 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     margin: 0;
                 }
 
+                button.apple-link,
                 .apple-link {
-                    color: var(--color-accent); /* #DC2626 */
-                    text-decoration: none;
-                    font-family: var(--font-body);
-                    background: transparent;
-                    border: none;
-                    padding: 0;
-                    margin: 0;
-                    cursor: pointer;
-                    display: inline;
-                    transition: opacity 0.2s var(--ease-apple);
+                    color: #DC2626 !important;
+                    text-decoration: none !important;
+                    font-family: var(--font-body) !important;
+                    background: transparent !important;
+                    border: none !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    cursor: pointer !important;
+                    display: inline !important;
+                    font-weight: 500 !important;
+                    transition: opacity 0.2s var(--ease-apple) !important;
                 }
 
+                button.apple-link:hover,
                 .apple-link:hover {
-                    opacity: 0.8;
+                    opacity: 0.8 !important;
                 }
 
                 /* Form Layout */
@@ -1529,12 +1560,66 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     color: var(--color-accent); /* #DC2626 */
                 }
 
+                /* Eyebrows — ALL uppercase, bold, Crimson Red */
+                .apple-eyebrow {
+                    font-family: var(--font-display) !important;
+                    font-size: 12px !important;
+                    font-weight: 700 !important;
+                    letter-spacing: 0.08em !important;
+                    text-transform: uppercase !important;
+                    color: #DC2626 !important;
+                    display: inline-block !important;
+                }
+
+                .apple-header-badge .apple-eyebrow {
+                    color: #DC2626 !important;
+                }
+
+                /* Primary Buttons — Solid Crimson Red pill */
+                button.apple-btn-primary,
+                .apple-btn-primary {
+                    background-color: #DC2626 !important;
+                    color: #FFFFFF !important;
+                    border: none !important;
+                    border-radius: 9999px !important;
+                    height: 48px !important;
+                    padding: 0 24px !important;
+                    font-family: var(--font-body) !important;
+                    font-size: 16px !important;
+                    font-weight: 600 !important;
+                    cursor: pointer !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 8px !important;
+                    text-decoration: none !important;
+                    box-sizing: border-box !important;
+                    transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.1s ease !important;
+                }
+
+                button.apple-btn-primary:hover:not(:disabled),
+                .apple-btn-primary:hover:not(:disabled) {
+                    background-color: #B91C1C !important;
+                }
+
+                button.apple-btn-primary:active:not(:disabled),
+                .apple-btn-primary:active:not(:disabled) {
+                    background-color: #991B1B !important;
+                    transform: scale(0.99) !important;
+                }
+
+                button.apple-btn-primary:disabled,
+                .apple-btn-primary:disabled {
+                    opacity: 0.65 !important;
+                    cursor: not-allowed !important;
+                }
+
                 /* Buttons */
                 .full-width {
-                    width: 100%;
-                    height: 48px;
-                    font-size: 16px;
-                    font-weight: 600;
+                    width: 100% !important;
+                    height: 48px !important;
+                    font-size: 16px !important;
+                    font-weight: 600 !important;
                 }
 
                 .apple-card-footer {

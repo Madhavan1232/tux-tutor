@@ -1,3 +1,5 @@
 /* Global stylesheet entry — import order matters */
 @import './styles/tokens.css';
+@import './styles/typography.css';
+@import './styles/theme.css';
 @import './styles/global.css';
