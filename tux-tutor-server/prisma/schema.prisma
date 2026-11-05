@@ -7,48 +7,98 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ── Users ──────────────────────────────────────────────────────────────
 model User {
-  id           Int           @id @default(autoincrement())
-  username     String        @unique
-  email        String        @unique
-  password     String
-  xp           Int           @default(0)
-  level        Int           @default(1)
-  streak       Int           @default(0)
-  createdAt    DateTime      @default(now())
-  userMissions UserMission[]
-  achievements Achievement[]
+  id                  Int                  @id @default(autoincrement())
+  username            String               @unique
+  email               String               @unique
+  password            String
+  xp                  Int                  @default(0)
+  level               Int                  @default(1)
+  streak              Int                  @default(0)
+  streakCurrent       Int                  @default(0) @map("streak_current")
+  streakBest          Int                  @default(0) @map("streak_best")
+  lastActiveDate      DateTime?            @map("last_active_date")
+  createdAt           DateTime             @default(now())
+
+  userMissions        UserMission[]
+  achievements        Achievement[]
+  xpEvents            XpEvent[]
   passwordResetTokens PasswordResetToken[]
+
+  @@map("User")
+}
+
+// ── Worlds ─────────────────────────────────────────────────────────────
+model World {
+  id                 Int       @id @default(autoincrement())
+  name               String
+  orderIndex         Int       @unique @map("order_index")
+  unlockRequirement  Int       @default(0) @map("unlock_requirement")
+
+  missions           Mission[]
+}
+
+// ── Missions ───────────────────────────────────────────────────────────
+enum MissionType {
+  mission
+  boss
 }
 
 model Mission {
   id             Int           @id @default(autoincrement())
   title          String
   description    String
-  world          String
-  xpReward       Int           @default(10)
+  world          String?
+  worldId        Int?          @map("world_id")
+  orderIndex     Int           @default(0) @map("order_index")
+  type           MissionType   @default(mission)
+  xpReward       Int           @default(50) @map("xp_reward")
   command        String
   expectedOutput String
+  createdAt      DateTime      @default(now())
+
+  worldRef       World?        @relation(fields: [worldId], references: [id], onDelete: Cascade)
   userMissions   UserMission[]
+
+  @@map("Mission")
 }
 
 model UserMission {
   id          Int      @id @default(autoincrement())
-  userId      Int
-  missionId   Int
-  completedAt DateTime @default(now())
+  userId      Int      @map("user_id")
+  missionId   Int      @map("mission_id")
+  completedAt DateTime @default(now()) @map("completed_at")
+
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   mission     Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, missionId])
+  @@map("UserMission")
 }
 
+// ── XP Events (for weekly leaderboard) ───────────────────────────────
+model XpEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  amount    Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("XpEvent")
+}
+
+// ── Achievements ──────────────────────────────────────────────────────
 model Achievement {
   id       Int      @id @default(autoincrement())
-  userId   Int
+  userId   Int      @map("user_id")
   badge    String
-  earnedAt DateTime @default(now())
+  earnedAt DateTime @default(now()) @map("earned_at")
+
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("Achievement")
 }
 
 model Otp {

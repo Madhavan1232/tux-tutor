@@ -1,11 +1,25 @@
-import { colors } from './colors'
+// =============================================================================
+// TUX TUTOR — JavaScript Color Tokens & World Definitions
+// Single source of truth for JS-side color references.
+// =============================================================================
 
-export { colors }
-export const COLORS = colors
+import { colors } from './colors';
+
+export { colors };
+export const COLORS = {
+  background:    colors.bg?.base || '#FBFBFD',
+  primary:       colors.accent?.default || '#DC2626',
+  surface:       colors.bg?.surface || '#FFFFFF',
+  secondaryRed:  colors.accent?.hover || '#B91C1C',
+  darkBurgundy:  colors.accent?.muted || 'rgba(220, 38, 38, 0.08)',
+  deepRed:       colors.accent?.muted || 'rgba(220, 38, 38, 0.08)',
+  textPrimary:   colors.text?.primary || '#1D1D1F',
+  textSecondary: colors.text?.secondary || '#6E6E73',
+};
 
 export const WORLDS = [
   {
-    id: '001.',
+    id: 1,
     title: 'Directory Navigation & File Operations',
     slug: 'navigation',
     description: 'Master cd, ls, pwd, mkdir, rm, and POSIX tree traversal.',
@@ -14,7 +28,7 @@ export const WORLDS = [
     active: true,
   },
   {
-    id: '002.',
+    id: 2,
     title: 'Permissions & User Ownership',
     slug: 'permissions',
     description: 'Deconstruct chmod, chown, octal modes (755, 644), and umask.',
@@ -23,7 +37,7 @@ export const WORLDS = [
     active: false,
   },
   {
-    id: '003.',
+    id: 3,
     title: 'Stream Redirection & Text Processing',
     slug: 'pipes',
     description: 'Chain grep, sed, awk, stdin, stdout, and standard stream pipes.',
@@ -32,7 +46,7 @@ export const WORLDS = [
     active: false,
   },
   {
-    id: '004.',
+    id: 4,
     title: 'Process Management & Daemons',
     slug: 'processes',
     description: 'Signal control, ps aux, top, kill -9, nice, and systemd units.',
@@ -41,7 +55,7 @@ export const WORLDS = [
     active: false,
   },
   {
-    id: '005.',
+    id: 5,
     title: 'Networking & Port Inspection',
     slug: 'networking',
     description: 'Examine ss -tulpn, curl, dig, ip route, and iptables socket flow.',
@@ -50,7 +64,7 @@ export const WORLDS = [
     active: false,
   },
   {
-    id: '006.',
+    id: 6,
     title: 'Bash Scripting & Automation',
     slug: 'scripting',
     description: 'Craft executable shell programs, variables, conditionals, and loops.',
@@ -59,7 +73,7 @@ export const WORLDS = [
     active: false,
   },
   {
-    id: '007.',
+    id: 7,
     title: 'User Management & Sudoers',
     slug: 'users',
     description: 'Administer useradd, /etc/shadow, group policies, and visudo.',
@@ -68,7 +82,7 @@ export const WORLDS = [
     active: false,
   },
   {
-    id: '008.',
+    id: 8,
     title: 'System Hardening & Security Audit',
     slug: 'security',
     description: 'Audit journalctl logs, SSH hardening, and kernel sysctl flags.',
@@ -76,4 +90,4 @@ export const WORLDS = [
     commandPreview: 'sysctl -w net.ipv4.tcp_syncookies=1',
     active: false,
   },
-]
+];

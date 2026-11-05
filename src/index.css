@@ -1,5 +1,7 @@
+/* Global stylesheet entry — import order matters */
 @import './styles/tokens.css';
 @import './styles/theme.css';
+@import './styles/global.css';
 
 #root {
   min-height: 100vh;
