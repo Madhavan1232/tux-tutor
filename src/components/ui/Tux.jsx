@@ -1,6 +1,6 @@
 /**
  * Tux — the Tux Tutor penguin mascot, rendered as inline SVG.
- * Flat, palette-only, no gradients, no glow, no official Tux artwork.
+ * Clean, iconic Apple-style design adhering to the white & red palette.
  *
  * Moods:
  *  idle  — gentle sway (default)
@@ -33,36 +33,41 @@ export default function Tux({ mood = 'idle', size = 120, className = '' }) {
       role="img"
       aria-label={`Tux the penguin — ${mood} mood`}
     >
-      {/* Feet / shadow */}
-      <ellipse cx="44" cy="131" rx="13" ry="5" fill="var(--color-text-secondary)" opacity="0.5" />
-      <ellipse cx="76" cy="131" rx="13" ry="5" fill="var(--color-text-secondary)" opacity="0.5" />
+      {/* Feet */}
+      <ellipse cx="44" cy="131" rx="13" ry="5" fill="var(--color-accent)" opacity="0.9" />
+      <ellipse cx="76" cy="131" rx="13" ry="5" fill="var(--color-accent)" opacity="0.9" />
 
       {/* Wings */}
       <ellipse
         cx="22" cy="84" rx="8" ry="26"
-        fill="var(--color-surface)"
-        stroke="var(--color-dark-burgundy)"
-        strokeWidth="1.5"
+        fill="#1D1D1F"
+        stroke="#111113"
+        strokeWidth="1.2"
         transform={`rotate(${wing.l} 26 62)`}
       />
       <ellipse
         cx="98" cy="84" rx="8" ry="26"
-        fill="var(--color-surface)"
-        stroke="var(--color-dark-burgundy)"
-        strokeWidth="1.5"
+        fill="#1D1D1F"
+        stroke="#111113"
+        strokeWidth="1.2"
         transform={`rotate(${wing.r} 94 62)`}
       />
 
       {/* Body */}
       <ellipse
         cx="60" cy="78" rx="38" ry="52"
-        fill="var(--color-surface)"
-        stroke="var(--color-dark-burgundy)"
-        strokeWidth="1.5"
+        fill="#1D1D1F"
+        stroke="#111113"
+        strokeWidth="1.2"
       />
 
       {/* Belly */}
-      <ellipse cx="60" cy="90" rx="25" ry="37" fill="var(--color-text-primary)" opacity="0.92" />
+      <ellipse
+        cx="60" cy="90" rx="25" ry="37"
+        fill="#FFFFFF"
+        stroke="rgba(0, 0, 0, 0.08)"
+        strokeWidth="1"
+      />
 
       {/* Eyes */}
       {asleep ? (
@@ -70,54 +75,35 @@ export default function Tux({ mood = 'idle', size = 120, className = '' }) {
           {/* Closed eye curves */}
           <path
             d="M43 48 Q49 53 55 48"
-            stroke="var(--color-text-primary)"
-            strokeWidth="2"
+            stroke="#FFFFFF"
+            strokeWidth="2.5"
             fill="none"
             strokeLinecap="round"
           />
           <path
             d="M65 48 Q71 53 77 48"
-            stroke="var(--color-text-primary)"
-            strokeWidth="2"
+            stroke="#FFFFFF"
+            strokeWidth="2.5"
             fill="none"
             strokeLinecap="round"
           />
         </>
       ) : (
         <>
-          <circle cx="49" cy="48" r="6"   fill="var(--color-text-primary)" />
-          <circle cx="71" cy="48" r="6"   fill="var(--color-text-primary)" />
-          <circle cx="50" cy="48" r="2.5" fill="var(--color-background)"  />
-          <circle cx="72" cy="48" r="2.5" fill="var(--color-background)"  />
+          <circle cx="49" cy="48" r="6.5" fill="#FFFFFF" />
+          <circle cx="71" cy="48" r="6.5" fill="#FFFFFF" />
+          <circle cx="50" cy="48.5" r="3.2" fill="#1D1D1F" />
+          <circle cx="72" cy="48.5" r="3.2" fill="#1D1D1F" />
+          <circle cx="51.5" cy="47" r="1.2" fill="#FFFFFF" />
+          <circle cx="73.5" cy="47" r="1.2" fill="#FFFFFF" />
         </>
       )}
 
-      {/* Beak — palette only, no yellow */}
+      {/* Beak */}
       <path
-        d="M52 58 Q60 51 68 58 Q60 71 52 58Z"
-        fill="var(--color-text-secondary)"
+        d="M52 57 Q60 50 68 57 Q60 70 52 57Z"
+        fill="var(--color-accent)"
       />
-
-      {/* Cheeks for cheer */}
-      {mood === 'cheer' && (
-        <>
-          <circle cx="43" cy="56" r="5" fill="var(--color-primary)" opacity="0.4" />
-          <circle cx="77" cy="56" r="5" fill="var(--color-primary)" opacity="0.4" />
-        </>
-      )}
-
-      {/* Root badge for think mode (# symbol) */}
-      {mood === 'think' && (
-        <text
-          x="82" y="30"
-          fontSize="14"
-          fontFamily="var(--font-mono)"
-          fill="var(--color-primary)"
-          fontWeight="600"
-        >
-          #
-        </text>
-      )}
     </svg>
   );
 }

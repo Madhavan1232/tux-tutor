@@ -8,21 +8,21 @@
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-widest);
-  color: var(--color-text-secondary);
+  color: var(--color-accent);
   font-weight: var(--weight-semibold);
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .row {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
+  padding: 8px 10px;
   border-radius: var(--radius-sm);
   transition: background-color var(--duration-fast) var(--ease-apple);
 }
@@ -34,7 +34,7 @@
 /* Current user highlight */
 .you {
   background-color: var(--color-accent-muted);
-  border: 1px solid rgba(232, 25, 44, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.2);
 }
 
 .rank {
@@ -47,7 +47,8 @@
 }
 
 .you .rank {
-  color: var(--color-text-primary);
+  color: var(--color-accent);
+  font-weight: var(--weight-bold);
 }
 
 .avatar {
@@ -57,15 +58,15 @@
 .username {
   flex: 1;
   font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .you .username {
-  color: var(--color-text-primary);
-  font-weight: var(--weight-semibold);
+  color: var(--color-accent);
+  font-weight: var(--weight-bold);
 }
 
 .xp {
@@ -78,5 +79,6 @@
 }
 
 .you .xp {
-  color: var(--color-text-primary);
+  color: var(--color-accent);
+  font-weight: var(--weight-bold);
 }

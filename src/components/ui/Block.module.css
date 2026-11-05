@@ -2,8 +2,8 @@
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   border: 1px solid var(--color-border-subtle);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background-color: var(--color-bg-surface);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
 }
 
 /* Variants */
@@ -17,10 +17,10 @@
 
 .burgundy {
   background-color: var(--color-accent-muted);
-  border-color: rgba(232, 25, 44, 0.3);
+  border-color: rgba(220, 38, 38, 0.25);
   color: var(--color-text-primary);
 }
 
 .burgundy p {
-  color: rgba(240, 240, 240, 0.85);
+  color: var(--color-text-secondary);
 }

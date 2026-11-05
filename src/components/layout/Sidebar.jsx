@@ -14,10 +14,16 @@ const NAV_ITEMS = [
 
 /**
  * Sidebar — desktop left navigation + mobile bottom tab bar.
- * Black background, white labels, burgundy selected state.
+ * Apple-style white surface, dark text, and crimson active state.
  */
 export default function Sidebar() {
   const location = useLocation();
+
+  const handleSignOut = () => {
+    localStorage.removeItem('tux_user');
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  };
 
   return (
     <>
@@ -51,6 +57,13 @@ export default function Sidebar() {
 
         {/* Footer */}
         <div className={styles.sidebarFooter}>
+          <button
+            type="button"
+            className={styles.signOutBtn}
+            onClick={handleSignOut}
+          >
+            Sign Out
+          </button>
           <span className={styles.version}>v0.1</span>
         </div>
       </aside>
@@ -65,7 +78,6 @@ export default function Sidebar() {
               `${styles.tab} ${isActive ? styles.tabActive : ''}`
             }
             aria-label={label}
-            aria-current={location.pathname === to ? 'page' : undefined}
           >
             <span className={styles.tabIcon} aria-hidden="true">{icon}</span>
             <span className={styles.tabLabel}>{label}</span>

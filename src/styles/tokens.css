@@ -1,52 +1,111 @@
 /* ==========================================================================
-   TUX TUTOR — APPLE STORE-STYLE DESIGN SYSTEM CONSTANTS & TOKENS
-   Off-white light mode with crimson (#DC2626) as the only accent.
+   TUX TUTOR — CSS DESIGN TOKENS (Apple-Style White & Crimson Design Language)
+   Single source of truth. Never hardcode hex values in components.
    ========================================================================== */
 
-@import './typography.css';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* === BACKGROUNDS (Apple Off-White Light Mode) === */
+  /* ══════════════════════════════════════════════════════════════════════
+     COLOR TOKENS (Apple White & Red Design System)
+  ══════════════════════════════════════════════════════════════════════ */
+
+  /* === BACKGROUNDS === */
   --color-bg-base:        #FBFBFD;   /* Apple's off-white page background */
-  --color-bg-surface:     #FFFFFF;   /* Clean white cards, modals, panels */
-  --color-bg-elevated:    #F5F5F7;   /* Secondary surface, hover, dropdowns */
+  --color-bg-surface:     #FFFFFF;   /* Cards, modals, panels, sidebar */
+  --color-bg-elevated:    #F5F5F7;   /* Hover states, dropdowns, secondary surfaces */
 
   /* === BORDERS === */
-  --color-border-subtle:  #D2D2D7;   /* Apple's 0.5px / 1px subtle divider & border */
-  --color-border-focus:   #DC2626;   /* Crimson focused input borders */
+  --color-border-subtle:  #D2D2D7;   /* Dividers, input borders */
+  --color-border-focus:   #DC2626;   /* Focused input borders */
 
-  /* === TEXT (Apple's Near-Black & Warm Muted Gray) === */
-  --color-text-primary:   #1D1D1F;   /* Apple's near-black, never pure #000 */
-  --color-text-secondary: #6E6E73;   /* Apple's warm muted gray (not #888 or #999) */
-  --color-text-muted:     #86868B;   /* Metadata, tertiary hints */
+  /* === TEXT === */
+  --color-text-primary:   #1D1D1F;   /* Headings, main content (Apple near-black) */
+  --color-text-secondary: #6E6E73;   /* Labels, subtext, placeholders (Apple warm muted gray) */
+  --color-text-muted:     #86868B;   /* Disabled, hints */
 
-  /* === ACCENT (Crimson — #DC2626 is the ONLY accent) === */
-  --color-accent:         #DC2626;   /* Primary CTA, eyebrows, links */
+  /* === ACCENT (Crimson) === */
+  --color-accent:         #DC2626;   /* Primary CTA, highlights, active states */
   --color-accent-hover:   #B91C1C;   /* Button hover */
-  --color-accent-muted:   rgba(220, 38, 38, 0.08); /* Subtle crimson tint */
-  --color-accent-glow:    rgba(220, 38, 38, 0.12); /* Soft focus ring */
+  --color-accent-muted:   rgba(220, 38, 38, 0.08); /* Subtle accent backgrounds */
+  --color-accent-glow:    rgba(220, 38, 38, 0.12); /* Focus glow, shadows */
 
   /* === FEEDBACK === */
-  --color-success:        #15803D;   /* Verified, success states */
+  --color-success:        #15803D;   /* Success states */
   --color-error:          #DC2626;   /* Validation errors */
   --color-warning:        #B45309;   /* Warnings */
 
-  /* ── Legacy & Compatibility Aliases ── */
+  /* ── Legacy Aliases ── */
   --color-background:     var(--color-bg-base);
   --color-surface:        var(--color-bg-surface);
   --color-primary:        var(--color-accent);
   --color-secondary-red:  var(--color-accent-hover);
-  --color-dark-burgundy:  var(--color-accent-muted);
-  --color-deep-red:       var(--color-accent-muted);
+  --color-dark-burgundy:  var(--color-accent);
+  --color-deep-red:       var(--color-accent-hover);
   --bg-app:               var(--color-bg-base);
   --bg-surface:           var(--color-bg-surface);
-  --bg-panel-burgundy:    var(--color-accent);
-  --bg-hover-burgundy:    var(--color-accent-muted);
+  --bg-panel-burgundy:    var(--color-accent-muted);
+  --bg-hover-burgundy:    rgba(220, 38, 38, 0.14);
   --text-primary:         var(--color-text-primary);
   --text-secondary:       var(--color-text-secondary);
 
-  /* === SPACING & LAYOUT SYSTEM (Multiples of 4 / 8px) === */
+  /* ══════════════════════════════════════════════════════════════════════
+     TYPOGRAPHY TOKENS (Apple-Inspired Typography System)
+  ══════════════════════════════════════════════════════════════════════ */
+
+  /* === FONT FAMILIES === */
+  --font-display:  -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  --font-body:     -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+
+  /* Legacy Font Aliases */
+  --font-sans:     var(--font-body);
+  --font-heading:  var(--font-display);
+
+  /* === FONT SIZES === */
+  --text-xs:    0.75rem;     /* 12px — captions, legal */
+  --text-sm:    0.8125rem;   /* 13px — footnotes, metadata */
+  --text-base:  1rem;        /* 16px — body */
+  --text-md:    1.0625rem;   /* 17px — Apple's default UI size */
+  --text-lg:    1.25rem;     /* 20px — subheadings */
+  --text-xl:    1.5rem;      /* 24px — section titles */
+  --text-2xl:   2rem;        /* 32px — page headings */
+  --text-3xl:   2.75rem;     /* 44px — hero / display */
+  --text-4xl:   3.5rem;      /* 56px — large display */
+
+  /* Legacy Font Size Aliases */
+  --text-overline: var(--text-xs);
+  --text-small:    var(--text-sm);
+  --text-body:     var(--text-base);
+  --text-h3:       var(--text-lg);
+  --text-h2:       var(--text-xl);
+  --text-h1:       var(--text-2xl);
+  --text-display:  clamp(var(--text-2xl), 5vw, var(--text-4xl));
+
+  /* === FONT WEIGHTS === */
+  --weight-thin:       300;
+  --weight-light:      300;
+  --weight-regular:    400;
+  --weight-medium:     500;
+  --weight-semibold:   600;
+  --weight-bold:       700;
+
+  /* === LINE HEIGHTS === */
+  --leading-tight:   1.1;
+  --leading-snug:    1.25;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.65;
+
+  /* === LETTER SPACING === */
+  --tracking-tight:   -0.025em;
+  --tracking-snug:    -0.01em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.04em;
+  --tracking-widest:   0.08em;
+
+  /* ══════════════════════════════════════════════════════════════════════
+     SPACING & LAYOUT SYSTEM (Multiples of 4 / 8px)
+  ══════════════════════════════════════════════════════════════════════ */
   --space-1:   4px;
   --space-2:   8px;
   --space-3:   12px;
@@ -69,7 +128,9 @@
   --radius-2xl:  28px;   /* Feature cards */
   --radius-pill: 9999px; /* Buttons, chips */
 
-  /* === MOTION & TRANSITIONS === */
+  /* ══════════════════════════════════════════════════════════════════════
+     MOTION & TRANSITIONS
+  ══════════════════════════════════════════════════════════════════════ */
   --ease-apple:   cubic-bezier(0.25, 0.1, 0.25, 1.0);
   --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1.0);
   --ease-smooth:  cubic-bezier(0.4, 0.0, 0.2, 1.0);
@@ -91,6 +152,6 @@
 
   /* === LAYOUT SIZES === */
   --sidebar-width:   240px;
-  --rail-width:      300px;
-  --path-max-width:  580px;
+  --rail-width:      320px;
+  --path-max-width:  620px;
 }

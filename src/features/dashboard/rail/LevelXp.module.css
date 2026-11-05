@@ -8,8 +8,8 @@
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-widest);
-  color: var(--color-text-secondary);
-  font-weight: var(--weight-semibold);
+  color: var(--color-accent);
+  font-weight: var(--weight-bold);
 }
 
 .levelRow {
@@ -20,7 +20,7 @@
 
 .levelNum {
   font-size: var(--text-lg);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
   color: var(--color-text-primary);
   letter-spacing: var(--tracking-snug);
 }
@@ -33,6 +33,7 @@
 
 .xpCurrent {
   font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }

@@ -1,6 +1,6 @@
 /**
  * PenguinAvatar — small penguin avatars for leaderboard rows.
- * Three visual variants: filled (burgundy), outline (white), and muted.
+ * Three visual variants: filled (accent), outline (crisp), and muted.
  *
  * @param {'filled'|'outline'|'muted'} [variant='muted']
  * @param {number} [size=28]
@@ -13,26 +13,25 @@ export default function PenguinAvatar({
   username = 'User',
   className = '',
 }) {
-  /* Resolve fill/stroke per variant from CSS vars */
   const bodyFill =
-    variant === 'filled'  ? 'var(--color-primary)'      :
-    variant === 'outline' ? 'var(--color-background)'   :
-    /* muted */             'var(--color-surface)';
+    variant === 'filled'  ? 'var(--color-accent)' :
+    variant === 'outline' ? '#FFFFFF' :
+    '#1D1D1F';
 
   const bodyStroke =
-    variant === 'filled'  ? 'var(--color-secondary-red)'  :
-    variant === 'outline' ? 'var(--color-text-primary)'   :
-    /* muted */             'var(--color-dark-burgundy)';
+    variant === 'filled'  ? 'var(--color-accent-hover)' :
+    variant === 'outline' ? 'var(--color-accent)' :
+    '#111113';
 
   const bellyFill =
-    variant === 'filled'  ? 'rgba(255,255,255,0.25)' :
-    variant === 'outline' ? 'var(--color-text-primary)' :
-    /* muted */             'var(--color-text-secondary)';
+    variant === 'filled'  ? 'rgba(255,255,255,0.85)' :
+    variant === 'outline' ? 'rgba(220, 38, 38, 0.1)' :
+    '#FFFFFF';
 
   const eyeFill =
-    variant === 'filled'  ? 'var(--color-text-primary)' :
-    variant === 'outline' ? 'var(--color-background)'   :
-    /* muted */             'var(--color-text-primary)';
+    variant === 'filled'  ? '#FFFFFF' :
+    variant === 'outline' ? 'var(--color-accent)' :
+    '#FFFFFF';
 
   return (
     <svg
@@ -57,13 +56,12 @@ export default function PenguinAvatar({
       {/* Eyes */}
       <circle cx="13" cy="9"  r="2" fill={eyeFill} />
       <circle cx="19" cy="9"  r="2" fill={eyeFill} />
-      <circle cx="13.6" cy="9.3" r="0.8" fill={bodyFill} />
-      <circle cx="19.6" cy="9.3" r="0.8" fill={bodyFill} />
+      <circle cx="13.6" cy="9.3" r="0.8" fill={bodyStroke} />
+      <circle cx="19.6" cy="9.3" r="0.8" fill={bodyStroke} />
       {/* Beak */}
       <path
         d="M13.5 13 Q16 10.5 18.5 13 Q16 17 13.5 13Z"
-        fill="var(--color-text-secondary)"
-        opacity="0.8"
+        fill="var(--color-accent)"
       />
       {/* Wings */}
       <ellipse cx="5"  cy="20" rx="3" ry="7" fill={bodyFill} stroke={bodyStroke} strokeWidth="1" />
