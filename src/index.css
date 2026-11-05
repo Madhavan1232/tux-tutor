@@ -1,8 +1,11 @@
+@import './styles/tokens.css';
 @import './styles/theme.css';
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-background);
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
 }

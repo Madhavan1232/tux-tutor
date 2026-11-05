@@ -1,5 +1,40 @@
-# Logs
-logs
+# ===================================================
+# Tux Tutor — Git Ignore Configuration
+# ===================================================
+
+# --- Dependencies ---
+node_modules/
+*/node_modules/
+.pnpm-store/
+
+# --- Build & Output Artifacts ---
+dist/
+dist-ssr/
+build/
+out/
+*.local
+
+# --- Environment & Credentials ---
+.env
+.env.*
+*.env
+!.env.example
+!.env.template
+
+# --- Playwright & End-to-End Testing ---
+.playwright-mcp/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.playwright/
+
+# --- Testing & Code Coverage ---
+coverage/
+.nyc_output/
+
+# --- Logs & Debug Output ---
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,21 +42,43 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-.env
-.env.*
-!.env.example
+# --- Cache & Runtime Artifacts ---
+.cache/
+.parcel-cache/
+.turbo/
+.eslintcache
+.stylelintcache
+.oxlintcache
+*.tsbuildinfo
 
-# Editor directories and files
+# --- Database & Prisma Generated ---
+/generated/prisma
+*.sqlite
+*.sqlite-journal
+*.db-journal
+
+# --- IDEs & Code Editors ---
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.sublime-project
+*.sublime-workspace
+
+# --- Operating System & Temporary Files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.tmp
+*.temp
+*~

@@ -18,6 +18,7 @@ model User {
   createdAt    DateTime      @default(now())
   userMissions UserMission[]
   achievements Achievement[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Mission {
@@ -48,4 +49,28 @@ model Achievement {
   badge    String
   earnedAt DateTime @default(now())
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Otp {
+  id         Int       @id @default(autoincrement())
+  email      String
+  otpHash    String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([email, createdAt])
+}
+
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
 }

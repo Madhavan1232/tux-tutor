@@ -1,151 +1,138 @@
-# Tux Tutor — Global UI Design System
+# Tux Tutor — Global Design System (Apple Store-Style Edition)
 
-**Role:** Senior UI/UX Designer & Frontend Engineer  
-**Aesthetic:** Minimalist Editorial • Dark Luxury • Pure Black & Deep Burgundy  
-**Core Motto:** *Black is the foundation. Deep red is the identity. White is the typography.*
-
----
-
-## 1. Visual Direction & Principles
-
-- **Minimalist Editorial:** High contrast, deliberate whitespace, refined layout balance.
-- **Dark Luxury Aesthetic:** Pure pitch-black (`#000000`) canvas with deliberate deep burgundy blocks (`#770600`).
-- **Typography Forward:** Large, elegant page headings, light-to-regular font weights, maximum readability.
-- **Asymmetrical Compositions:** Editorial rhythm rather than repetitive cards or grid-clutter.
-- **Minimal Decoration:** No unnecessary gradients, no bright glowing neon, no gaming dashboard clutter.
-- **Authentic Linux Terminal:** Pure black, clean monospace typography, burgundy subtle highlights.
+**Theme:** Off-White Light Mode with Crimson (`#DC2626`) as the Only Accent  
+**Aesthetic:** Apple Store Precision, Generous Spacing, and Mixed-Weight Typographic Hierarchy  
+**Single Source of Truth:** `src/styles/tokens.css` (CSS) and `src/theme/colors.js` (JavaScript)
 
 ---
 
-## 2. Global Color Palette
+## 1. Global Color Tokens
 
-| Variable | Hex Code | Token Name | Usage |
-|---|---|---|---|
-| **Background** | `#000000` | `--color-background` | Pure black primary canvas |
-| **Primary Red** | `#770600` | `--color-primary` | Main burgundy sections, hero panels, active states |
-| **Surface** | `#161414` | `--color-surface` | Subtle dark surfaces when separation is necessary |
-| **Secondary Red** | `#7A0401` | `--color-secondary-red` | Accent borders, secondary badges, status markers |
-| **Dark Burgundy** | `#4D0B08` | `--color-dark-burgundy` | Hover backgrounds, selected states |
-| **Deep Red** | `#170001` | `--color-deep-red` | Deep dark red detailing, subtle panel depths |
-| **Primary Text** | `#FFFFFF` | `--color-text-primary` | Main headings, primary values, active labels |
-| **Secondary Text** | `#BCB3B3` | `--color-text-secondary` | Editorial subheaders, descriptions, muted info |
+All colors across the application strictly reference these tokens. Never hardcode hex values anywhere else in the codebase.
 
-### Strict Color Rules
-1. **Black must dominate** the entire application (at least 70-80% visual weight).
-2. **Deep burgundy** is reserved for high-impact sections, primary buttons, selected navigation, and milestones.
-3. **No gray backgrounds:** Never use generic `#1f2937` or slate gray card backgrounds.
-4. **No neon effects:** Never use bright red (`#ff0000`), neon pink, or high-glow neon shadows.
-5. **No unrelated colors:** Strictly no blue, purple, green, yellow, or teal accents anywhere in the UI.
-6. **White typography:** High contrast against black and burgundy for effortless readability.
-
----
-
-## 3. Typography Hierarchy
-
-### Preferred Typefaces
-- **Primary / Body:** `Inter`, `Manrope`, or `DM Sans`
-- **Headings:** `Inter` or `Manrope` (regular to medium weight, tracked tightly for large sizes)
-- **Terminal & Code:** `JetBrains Mono`, `Fira Code`, or `ui-monospace`
-
-### Scale
-- **Display 1 (Page Titles):** `clamp(2.5rem, 6vw, 4.5rem)` • `font-weight: 400 - 500` • `letter-spacing: -0.03em`
-- **Heading 2 (Section Titles):** `1.75rem - 2.25rem` • `font-weight: 500` • `letter-spacing: -0.02em`
-- **Heading 3 (Card / Panel Titles):** `1.15rem - 1.35rem` • `font-weight: 500`
-- **Body Regular:** `0.95rem - 1.05rem` • `line-height: 1.6` • `#BCB3B3`
-- **Code / Terminal:** `0.85rem - 0.95rem` • `font-family: var(--font-mono)` • `#FFFFFF`
-- **Overline / Label:** `0.75rem` • `text-transform: uppercase` • `letter-spacing: 0.12em` • `color: #770600` or `#BCB3B3`
-
----
-
-## 4. Component Design System
-
-### Buttons
-- **Primary Action:**
-  - Background: `#770600`
-  - Text: `#FFFFFF`
-  - Border: `1px solid #7A0401`
-  - Radius: `4px` or `6px` (sharp/architectural, never rounded pills)
-  - Hover: Background `#4D0B08`, Border `#770600`
-- **Secondary / Ghost Action:**
-  - Background: `transparent` or `#161414`
-  - Text: `#FFFFFF`
-  - Border: `1px solid rgba(119, 6, 0, 0.4)`
-  - Hover: Border `#770600`, Background `rgba(119, 6, 0, 0.15)`
-
-### Navigation (Sidebar)
-- Background: `#000000`
-- Border Right: `1px solid rgba(119, 6, 0, 0.2)`
-- Links: `#BCB3B3` regular weight
-- Active Link: Background `#770600` with text `#FFFFFF` (clean architectural block)
-- Hover Link: Background `rgba(77, 11, 8, 0.5)` with text `#FFFFFF`
-
-### Cards & Panels
-- Background: `#000000` with subtle `1px solid #161414` or `rgba(119, 6, 0, 0.2)` borders.
-- Editorial Callout Panels: Deep burgundy background (`#770600` or `#4D0B08`) with white text.
-- Spacing: Generous padding (`1.75rem` to `2.5rem`), breathing room, high negative space.
-
-### Linux Terminal
-- Canvas: Pure black `#000000`
-- Border: `1px solid rgba(119, 6, 0, 0.35)`
-- Prompt: `tux@archlinux:~$ ` with `tux` in `#770600` or `#BCB3B3` and command in `#FFFFFF`
-- Output: `#FFFFFF` (regular) and `#BCB3B3` (supporting logs)
-- Error / Notice: Deep burgundy accent `#7A0401`
-
-### Progress & Level Tracking
-- Track: `#161414` or pure `#000000` with border
-- Fill: `#770600`
-- Value: `#FFFFFF` tabular numbers
-
----
-
-## 5. Screen Coverage (Uniform Design Language)
-
-1. **Landing Page:** Hero with bold editorial title, deep burgundy marquee block, minimal interactive terminal preview.
-2. **Authentication (Login / Register):** Pure black split or minimal center with burgundy accent panel.
-3. **Dashboard:** Welcome editorial section with minimal Tux Linux silhouette, XP bar, 8 worlds roadmap, daily streak.
-4. **Worlds (8 Learning Worlds):**
-   - World 1: Navigation & File Operations
-   - World 2: Permissions & Ownership
-   - World 3: Pipes, Redirection & Text Processing
-   - World 4: Process Management & System Monitoring
-   - World 5: Networking & Ports
-   - World 6: Bash Scripting & Automation
-   - World 7: User Management & Sudo
-   - World 8: System Administration & Hardening
-5. **Mission Details:** Split editorial view with mission briefing on the left, interactive terminal on the right.
-6. **Interactive Terminal Sandbox:** Real-time command parsing, terminal history, mission verification.
-7. **Achievements & Badges:** Minimalist dark trophy showcase with burgundy seals.
-8. **Boss Challenges:** Timed scenario missions with countdown and high-stakes linux debug drills.
-9. **Leaderboard:** Editorial typography rank table with weekly reset timer.
-10. **User Profile:** Career stats, completed worlds, badge collection, terminal config.
-11. **Settings:** Preferences, terminal font size, keybindings, account management.
-
----
-
-## 6. Technical Tokens Defined
+### CSS Custom Properties (`src/styles/tokens.css`)
 
 ```css
 :root {
-  /* Color Tokens */
-  --color-background: #000000;
-  --color-primary: #770600;
-  --color-surface: #161414;
-  --color-secondary-red: #7A0401;
-  --color-dark-burgundy: #4D0B08;
-  --color-deep-red: #170001;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #BCB3B3;
+  /* === BACKGROUNDS (Apple Off-White Light Mode) === */
+  --color-bg-base:       #FBFBFD;   /* Apple's off-white page background */
+  --color-bg-surface:    #FFFFFF;   /* Clean white cards, modals, panels */
+  --color-bg-elevated:   #F5F5F7;   /* Secondary surface, hover, dropdowns */
 
-  /* Typography */
-  --font-sans: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  /* === BORDERS === */
+  --color-border-subtle: #D2D2D7;   /* Apple's 0.5px / 1px subtle divider & border */
+  --color-border-focus:  #DC2626;   /* Crimson focused input borders */
 
-  /* Borders & Radii */
-  --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
-  --border-burgundy: 1px solid rgba(119, 6, 0, 0.4);
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
+  /* === TEXT (Apple's Near-Black & Warm Muted Gray) === */
+  --color-text-primary:  #1D1D1F;   /* Apple's near-black, never pure #000 */
+  --color-text-secondary:#6E6E73;   /* Apple's warm muted gray (not #888 or #999) */
+  --color-text-muted:    #86868B;   /* Metadata, tertiary hints */
+
+  /* === ACCENT (Crimson — #DC2626 is the ONLY accent) === */
+  --color-accent:        #DC2626;   /* Primary CTA, eyebrows, links */
+  --color-accent-hover:  #B91C1C;   /* Button hover */
+  --color-accent-muted:  rgba(220, 38, 38, 0.08); /* Subtle crimson tint */
+  --color-accent-glow:   rgba(220, 38, 38, 0.12); /* Soft focus ring */
+
+  /* === FEEDBACK === */
+  --color-success:       #15803D;   /* Verified, success states */
+  --color-error:         #DC2626;   /* Validation errors */
+  --color-warning:       #B45309;   /* Warnings */
 }
 ```
 
+---
+
+## 2. Apple Store Typographic System
+
+### Font Stack
+- **Headings:** `-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', sans-serif;`
+- **Body:** `-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Helvetica Neue', sans-serif;`
+- **Mono:** `'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;` *(strictly for terminal code blocks, never for UI text)*
+
+### Typographic Scale
+- **Display (Hero Titles):**
+  - `font-size: clamp(40px, 6vw, 72px)`
+  - `font-weight: 700`
+  - `letter-spacing: -0.025em` (Apple's signature tightness)
+  - `line-height: 1.05`
+  - `color: #1D1D1F`
+- **Section Heading (`h2`):**
+  - `font-size: clamp(28px, 4vw, 48px)`
+  - `font-weight: 700`
+  - `letter-spacing: -0.02em`
+  - `line-height: 1.1`
+  - `color: #1D1D1F`
+- **Card Heading (`h3`):**
+  - `font-size: 20px` (or 24px)
+  - `font-weight: 600`
+  - `letter-spacing: -0.01em`
+  - `line-height: 1.2`
+  - `color: #1D1D1F`
+- **Body Text:**
+  - `font-size: 17px`
+  - `font-weight: 400`
+  - `letter-spacing: 0`
+  - `line-height: 1.65`
+  - `color: #6E6E73` (Apple's warm muted gray)
+- **Small / Caption:**
+  - `font-size: 13px`
+  - `font-weight: 400`
+  - `line-height: 1.5`
+  - `color: #6E6E73`
+- **Eyebrow Label:**
+  - `font-size: 12px`
+  - `font-weight: 600`
+  - `letter-spacing: 0.08em`
+  - `text-transform: uppercase`
+  - `color: #DC2626` (crimson accent ONLY on eyebrows and links)
+
+---
+
+## 3. Apple's Mixed-Weight Headline Trick
+
+For section headlines, split into two weights:
+```html
+<h1 class="apple-display-headline">
+  <span class="headline-accent">Learn Linux.</span>
+  <span class="headline-rest"> The right way.</span>
+</h1>
+```
+- `.headline-accent`: `color: #DC2626; font-weight: 700;`
+- `.headline-rest`: `color: #1D1D1F; font-weight: 300;`
+
+---
+
+## 4. Spacing Rules & Apple Component Styles
+
+- **Section padding:** 80px top/bottom on desktop, 40px on mobile
+- **Card padding:** 24px (and 32px on wide cards)
+- **Multiples of 8px:** `8, 16, 24, 32, 40, 48, 64, 80`
+- **Primary CTA Button:**
+  - `background: #DC2626`
+  - `color: #FFFFFF`
+  - `font-size: 17px`
+  - `font-weight: 400` (Apple buttons are NOT bold)
+  - `padding: 12px 24px`
+  - `border-radius: 980px` (Apple's pill shape)
+  - `letter-spacing: 0`
+- **Secondary / Ghost Button:**
+  - `background: transparent`
+  - `color: #1D1D1F`
+  - `border: 1px solid #1D1D1F`
+  - same sizing as primary (980px pill)
+- **Link Style:**
+  - `color: #DC2626`
+  - `text-decoration: none`
+  - Appended arrow: `" →"`
+  - Hover: `opacity: 0.8`
+
+---
+
+## 5. Strict Guardrails (What NOT to do)
+- ✗ **No `font-weight: 500`** — Apple uses 300, 400, 600, or 700. Skip 500.
+- ✗ **No pure black (`#000000`)** anywhere — use Apple's `#1D1D1F`.
+- ✗ **No letter-spacing on body text** — keep at 0; only headings get tight negative spacing.
+- ✗ **No `text-transform: uppercase` on headings** — only on 12px eyebrow labels.
+- ✗ **No tight line-height on body text** — keep at 1.65.
+- ✗ **No color other than `#1D1D1F` and `#6E6E73` for text**, and `#DC2626` only for accents, links, and eyebrows.

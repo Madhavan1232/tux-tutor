@@ -1,120 +1,144 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react"
+import AuthPage from "./components/auth/AuthPage"
+import ResetPasswordPage from "./components/auth/ResetPasswordPage"
+import HomePage from "./components/home/HomePage"
+import tuxLogo from "./assets/logo.png"
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isInitializing, setIsInitializing] = useState(true)
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem("tux_user")
+      return saved ? JSON.parse(saved) : null
+    } catch {
+      return null
+    }
+  })
+
+  // URL route parsing for password reset link
+  const [resetToken, setResetToken] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      return params.get("token") || ""
+    } catch {
+      return ""
+    }
+  })
+  const [isResetRoute, setIsResetRoute] = useState(() => {
+    try {
+      const isPath = window.location.pathname.includes("reset-password")
+      const params = new URLSearchParams(window.location.search)
+      return isPath || params.has("token")
+    } catch {
+      return false
+    }
+  })
+
+  // Auth notices after redirects (e.g. password reset success)
+  const [authNotice, setAuthNotice] = useState("")
+  const [prefilledEmail, setPrefilledEmail] = useState("")
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitializing(false)
+    }, 600)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    try {
+      if (currentUser) {
+        localStorage.setItem("tux_user", JSON.stringify(currentUser))
+      } else {
+        localStorage.removeItem("tux_user")
+      }
+    } catch {
+      // storage unavailable
+    }
+  }, [currentUser])
+
+  const handleAuthSuccess = (userData) => {
+    setCurrentUser(userData)
+  }
+
+  const handleSignOut = () => {
+    setCurrentUser(null)
+  }
+
+  const handleNavigateToLoginFromReset = (email = "", notice = "") => {
+    // Clear URL query without reload
+    try {
+      const cleanPath = window.location.pathname.replace("/reset-password", "") || "/"
+      window.history.replaceState({}, document.title, cleanPath)
+    } catch {
+      // ignore
+    }
+    setPrefilledEmail(email)
+    setAuthNotice(notice)
+    setIsResetRoute(false)
+    setResetToken("")
+  }
+
+  if (isInitializing) {
+    return (
+      <div
+        className="tux-splash-screen"
+        style={{
+          position: "fixed",
+          inset: 0,
+          backgroundColor: "var(--color-bg-base)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+        }}
+      >
+        <img
+          src={tuxLogo}
+          alt="TUX TUTOR"
+          className="tux-logo-pulse"
+          style={{
+            width: "100px",
+            height: "100px",
+            objectFit: "contain",
+            filter: "drop-shadow(0 4px 16px rgba(220, 38, 38, 0.25))",
+          }}
+        />
+        <div
+          style={{
+            marginTop: "24px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <span
+            className="apple-eyebrow"
+          >
+            Tux Tutor — Initializing Sandbox
+          </span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      {currentUser ? (
+        <HomePage user={currentUser} onSignOut={handleSignOut} />
+      ) : isResetRoute ? (
+        <ResetPasswordPage
+          token={resetToken}
+          onNavigateToLogin={handleNavigateToLoginFromReset}
+        />
+      ) : (
+        <AuthPage
+          onAuthSuccess={handleAuthSuccess}
+          initialEmail={prefilledEmail}
+          initialNotice={authNotice}
+        />
+      )}
     </>
   )
 }

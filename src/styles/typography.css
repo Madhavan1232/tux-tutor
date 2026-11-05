@@ -1,0 +1,230 @@
+/* ==========================================================================
+   TUX TUTOR — APPLE STORE-STYLE TYPOGRAPHY & DESIGN SYSTEM
+   Theme: Off-white light mode (#FBFBFD) with Crimson (#DC2626) as only accent.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  /* === FONT FAMILIES === */
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Helvetica Neue', sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Helvetica Neue', sans-serif;
+  --font-sans:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Helvetica Neue', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', 'SF Mono', monospace; /* USE ONLY FOR TERMINAL CODE BLOCKS */
+
+  /* === TYPOGRAPHIC SCALE === */
+  --text-display: clamp(40px, 6vw, 72px); /* Display (hero page titles) */
+  --text-h2:      clamp(28px, 4vw, 48px); /* Section heading */
+  --text-h3:      20px;                   /* Card heading */
+  --text-body:    17px;                   /* Apple default body */
+  --text-caption: 13px;                   /* Small / caption */
+  --text-eyebrow: 12px;                   /* Eyebrow label */
+
+  /* Standard aliases */
+  --text-xs:      12px;
+  --text-sm:      13px;
+  --text-base:    17px;
+  --text-md:      17px;
+  --text-lg:      20px;
+  --text-xl:      clamp(24px, 3vw, 32px);
+  --text-2xl:     clamp(28px, 4vw, 48px);
+  --text-3xl:     clamp(40px, 6vw, 72px);
+
+  /* === FONT WEIGHTS (Apple uses 300, 400, 600, 700. Skip 500) === */
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* === LINE HEIGHTS === */
+  --leading-display: 1.05; /* Display hero */
+  --leading-h2:      1.10; /* Section heading */
+  --leading-h3:      1.20; /* Card heading */
+  --leading-body:    1.65; /* Body text (Apple's relaxed reading) */
+  --leading-caption: 1.50; /* Caption */
+
+  /* === LETTER SPACING === */
+  --tracking-display: -0.025em; /* Apple's signature tightness */
+  --tracking-h2:      -0.02em;
+  --tracking-h3:      -0.01em;
+  --tracking-body:    0em;      /* NO letter-spacing on body text */
+  --tracking-eyebrow: 0.08em;   /* Eyebrows uppercase */
+
+  /* === SPACING RULES (Multiples of 8px) === */
+  --space-8:   8px;
+  --space-16:  16px;
+  --space-24:  24px;  /* Card padding */
+  --space-32:  32px;
+  --space-40:  40px;  /* Section padding mobile */
+  --space-48:  48px;
+  --space-64:  64px;
+  --space-80:  80px;  /* Section padding desktop */
+
+  /* Legacy aliases for safety */
+  --space-1:   8px;
+  --space-2:   8px;
+  --space-3:   16px;
+  --space-4:   16px;
+  --space-5:   24px;
+  --space-6:   24px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-20:  80px;
+
+  /* === BORDER RADIUS (Apple shapes) === */
+  --radius-card: 18px;    /* Apple Store cards */
+  --radius-input: 12px;   /* Form inputs */
+  --radius-pill: 980px;   /* Apple's pill shape for buttons */
+
+  /* Transition curves */
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+/* Base Body */
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings */
+h1, .apple-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+  color: var(--color-text-primary);
+}
+
+h2, .apple-h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-h2);
+  line-height: var(--leading-h2);
+  color: var(--color-text-primary);
+}
+
+h3, .apple-h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-h3);
+  line-height: var(--leading-h3);
+  color: var(--color-text-primary);
+}
+
+/* Eyebrow Label */
+.apple-eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-accent); /* Crimson #DC2626 */
+}
+
+/* Body Text */
+p, .apple-body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  color: var(--color-text-secondary); /* Apple's #6E6E73 */
+}
+
+/* Small / Caption */
+small, .apple-caption {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-caption);
+  color: var(--color-text-secondary);
+}
+
+/* Apple Mixed-Weight Headline Trick */
+.headline-accent {
+  color: var(--color-accent); /* #DC2626 */
+  font-weight: var(--weight-bold); /* 700 */
+}
+
+.headline-rest {
+  color: var(--color-text-primary); /* #1D1D1F */
+  font-weight: var(--weight-light); /* 300 */
+}
+
+/* Apple Buttons */
+.apple-btn-primary {
+  background-color: var(--color-accent);
+  color: #FFFFFF;
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: var(--weight-regular); /* Apple buttons are NOT bold */
+  padding: 12px 24px;
+  border-radius: var(--radius-pill); /* 980px pill */
+  letter-spacing: 0;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: opacity 0.2s var(--ease-apple), background-color 0.2s var(--ease-apple);
+}
+
+.apple-btn-primary:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+}
+
+.apple-btn-secondary {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: var(--weight-regular);
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: background-color 0.2s var(--ease-apple), opacity 0.2s var(--ease-apple);
+}
+
+.apple-btn-secondary:hover {
+  background-color: rgba(29, 29, 31, 0.05);
+}
+
+/* Apple Link Style */
+.apple-link {
+  color: var(--color-accent); /* #DC2626 */
+  text-decoration: none;
+  font-family: var(--font-body);
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  transition: opacity 0.2s var(--ease-apple);
+}
+
+.apple-link:hover {
+  opacity: 0.8;
+}
+
+/* Monospace - STRICTLY FOR TERMINAL CODE BLOCKS */
+pre, code, .terminal-mono {
+  font-family: var(--font-mono);
+}
