@@ -538,7 +538,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 <section className="apple-brand-panel">
                     <div className="apple-brand-content">
                         <div className="apple-brand-hero">
-                            <span className="apple-eyebrow">INTERACTIVE LINUX SANDBOX</span>
+                            <span className="apple-eyebrow">LEARN BY DOING · FREE TO START</span>
                             
                             {/* Apple's Mixed-Weight Headline Trick */}
                             <h1 className="apple-display-headline">
@@ -1191,7 +1191,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 .apple-brand-panel {
                     flex: 0 0 50%;
                     max-width: 50%;
-                    padding: 24px 60px;
+                    padding: 20px 48px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -1203,8 +1203,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 .apple-brand-content {
                     display: flex;
                     flex-direction: column;
-                    gap: 16px;
-                    max-width: 520px;
+                    gap: 14px;
+                    max-width: 500px;
                     width: 100%;
                 }
 
@@ -1216,16 +1216,18 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
 
                 /* Display Heading with Apple Mixed-Weight Trick */
                 .apple-display-headline {
-                    font-family: var(--font-display);
-                    font-size: clamp(34px, 3.8vw, 48px);
-                    line-height: 1.08;
-                    letter-spacing: var(--tracking-display); /* -0.025em */
-                    margin: 0;
+                    font-family: var(--font-display) !important;
+                    font-size: clamp(34px, 3.6vw, 44px) !important;
+                    line-height: 1.15 !important;
+                    letter-spacing: -0.025em !important;
+                    margin: 0 !important;
                 }
 
                 .apple-display-headline span {
                     font-size: inherit !important;
                     line-height: inherit !important;
+                    letter-spacing: inherit !important;
+                    display: inline !important;
                 }
 
                 .headline-accent {
@@ -1563,7 +1565,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 /* Eyebrows — ALL uppercase, bold, Crimson Red */
                 .apple-eyebrow {
                     font-family: var(--font-display) !important;
-                    font-size: 12px !important;
+                    font-size: 13px !important;
                     font-weight: 700 !important;
                     letter-spacing: 0.08em !important;
                     text-transform: uppercase !important;

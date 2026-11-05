@@ -18,7 +18,7 @@
   --text-h3:      20px;                   /* Card heading */
   --text-body:    17px;                   /* Apple default body */
   --text-caption: 13px;                   /* Small / caption */
-  --text-eyebrow: 12px;                   /* Eyebrow label */
+  --text-eyebrow: 13px;                   /* Eyebrow label */
 
   /* Standard aliases */
   --text-xs:      12px;
