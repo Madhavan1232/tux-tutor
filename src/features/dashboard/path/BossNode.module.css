@@ -1,0 +1,102 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.connector {
+  width: 2px;
+  height: 28px;
+  background-color: var(--color-accent);
+  border-radius: 1px;
+}
+
+.connector.locked {
+  background-color: var(--color-border-subtle);
+  opacity: 0.4;
+}
+
+.tuxSlot {
+  margin-bottom: var(--space-1);
+}
+
+/* Boss diamond node */
+.node {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-surface);
+  border: 2px solid var(--color-accent);
+  cursor: pointer;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  transition:
+    background-color var(--duration-fast) var(--ease-apple),
+    border-color var(--duration-fast) var(--ease-apple),
+    transform var(--duration-fast) var(--ease-spring),
+    opacity var(--duration-fast) var(--ease-apple);
+}
+
+.node:hover {
+  transform: scale(1.08) rotate(5deg);
+}
+
+.node:active {
+  transform: scale(0.95);
+}
+
+.node:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 5px;
+  border-radius: 0;
+}
+
+/* Completed */
+.nodeCompleted {
+  background-color: var(--color-accent);
+  border-color: #FFFFFF;
+}
+
+/* Current */
+.nodeCurrent {
+  background-color: var(--color-accent);
+  border-color: #FFFFFF;
+  box-shadow: 0 0 0 6px var(--color-accent-glow);
+}
+
+/* Locked */
+.nodeLocked {
+  border-color: var(--color-border-subtle);
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.nodeLocked:hover {
+  transform: none;
+}
+
+/* Inner symbol */
+.diamond {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.nodeLocked .diamond {
+  color: var(--color-text-muted);
+}
+
+/* Label */
+.label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+  letter-spacing: var(--tracking-wide);
+}
+
+.labelLocked {
+  opacity: 0.4;
+}

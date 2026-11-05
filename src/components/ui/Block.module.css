@@ -1,0 +1,26 @@
+.block {
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-subtle);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Variants */
+.black {
+  background-color: var(--color-bg-base);
+}
+
+.surface {
+  background-color: var(--color-bg-surface);
+}
+
+.burgundy {
+  background-color: var(--color-accent-muted);
+  border-color: rgba(232, 25, 44, 0.3);
+  color: var(--color-text-primary);
+}
+
+.burgundy p {
+  color: rgba(240, 240, 240, 0.85);
+}

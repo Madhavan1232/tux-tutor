@@ -1,245 +1,118 @@
 /* ==========================================================================
-   TUX TUTOR — GLOBAL UI DESIGN SYSTEM
-   Theme: Minimalist Editorial • Dark Luxury • Pure Black & Burgundy
+   TUX TUTOR — THEME (Apple-Style UI Components)
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Manrope:wght@300;400;500;600&display=swap');
-
-:root {
-  /* Core Color Tokens */
-  --color-background: #000000;
-  --color-primary: #770600;
-  --color-surface: #161414;
-  --color-secondary-red: #7A0401;
-  --color-dark-burgundy: #4D0B08;
-  --color-deep-red: #170001;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #BCB3B3;
-
-  /* Semantic References */
-  --bg-app: var(--color-background);
-  --bg-surface: var(--color-surface);
-  --bg-panel-burgundy: var(--color-primary);
-  --bg-hover-burgundy: var(--color-dark-burgundy);
-  
-  --text-primary: var(--color-text-primary);
-  --text-secondary: var(--color-text-secondary);
-
-  /* Typography */
-  --font-sans: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Manrope', 'Inter', -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
-
-  /* Borders */
-  --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
-  --border-surface: 1px solid #161414;
-  --border-burgundy: 1px solid rgba(119, 6, 0, 0.5);
-  --border-burgundy-focus: 1px solid var(--color-primary);
-
-  /* Radii - Sharp / Architectural */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-
-  /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
-}
-
-/* Reset & Global Base */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
-  font-family: var(--font-sans);
-  font-weight: 400;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-
-/* Base Headings */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: 500;
-  letter-spacing: -0.025em;
-  margin: 0 0 1rem 0;
-  color: var(--color-text-primary);
-}
-
-p {
-  color: var(--color-text-secondary);
-  margin: 0 0 1rem 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
-
-/* Reusable Editorial UI Classes */
-
-/* Buttons */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background-color: var(--color-primary);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-secondary-red);
-  padding: 0.75rem 1.75rem;
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
-}
-
-.btn-primary:hover {
-  background-color: var(--color-dark-burgundy);
-  border-color: var(--color-primary);
-}
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background-color: transparent;
-  color: var(--color-text-primary);
-  border: 1px solid rgba(119, 6, 0, 0.4);
-  padding: 0.75rem 1.75rem;
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  font-weight: 400;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-secondary:hover {
-  border-color: var(--color-primary);
-  background-color: rgba(119, 6, 0, 0.15);
-}
-
-/* Editorial Panels & Cards */
+/* Editorial / Apple Panels & Cards */
 .panel-black {
-  background-color: var(--color-background);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md);
-  padding: 2rem;
+  background-color: var(--color-bg-base);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
 }
 
 .panel-surface {
-  background-color: var(--color-surface);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: var(--radius-md);
-  padding: 2rem;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .panel-burgundy {
-  background-color: var(--color-primary);
-  border: 1px solid var(--color-secondary-red);
+  background-color: var(--color-accent-muted);
+  border: 1px solid rgba(232, 25, 44, 0.35);
   color: var(--color-text-primary);
-  border-radius: var(--radius-md);
-  padding: 2rem;
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .panel-burgundy p {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(240, 240, 240, 0.85);
 }
 
 /* Linux Terminal Window */
 .terminal-window {
-  background-color: #000000;
-  border: 1px solid rgba(119, 6, 0, 0.4);
-  border-radius: var(--radius-md);
+  background-color: var(--color-bg-base);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   overflow: hidden;
 }
 
 .terminal-header {
-  background-color: #0d0102;
-  border-bottom: 1px solid rgba(119, 6, 0, 0.3);
-  padding: 0.6rem 1rem;
+  background-color: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding: var(--space-3) var(--space-4);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .terminal-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: #333333;
+  background-color: var(--color-border-subtle);
 }
 
 .terminal-dot.active {
-  background-color: var(--color-primary);
+  background-color: var(--color-accent);
 }
 
 .terminal-title {
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-  margin-left: 0.5rem;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  margin-left: var(--space-2);
 }
 
 .terminal-body {
-  padding: 1.5rem;
+  padding: var(--space-6);
   color: var(--color-text-primary);
-  line-height: 1.6;
+  line-height: var(--leading-relaxed);
 }
 
 .terminal-prompt {
-  color: var(--color-primary);
-  margin-right: 0.5rem;
+  color: var(--color-accent);
+  margin-right: var(--space-2);
 }
 
 /* Progress Bar */
 .progress-track {
   width: 100%;
   height: 6px;
-  background-color: #121010;
-  border-radius: var(--radius-xs);
+  background-color: var(--color-bg-elevated);
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background-color: var(--color-primary);
-  transition: width 0.3s ease;
+  background-color: var(--color-accent);
+  border-radius: var(--radius-pill);
+  transition: width 0.35s var(--ease-smooth);
 }
 
 /* Typography Helpers */
 .text-overline {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-primary);
-  font-weight: 600;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-accent);
+  font-weight: var(--weight-semibold);
 }
 
 .text-muted {
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
 }
 
 .text-editorial-lg {
   font-size: clamp(2.5rem, 5vw, 4.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.035em;
-  font-weight: 400;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-bold);
 }
-

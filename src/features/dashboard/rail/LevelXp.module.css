@@ -1,0 +1,44 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.overline {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-semibold);
+}
+
+.levelRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.levelNum {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  letter-spacing: var(--tracking-snug);
+}
+
+.xpNumbers {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.xpCurrent {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.xpNext {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}

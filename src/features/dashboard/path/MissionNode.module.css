@@ -1,0 +1,134 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  transform: translateX(var(--offset, 0));
+  transition: transform var(--duration-normal) var(--ease-spring);
+  position: relative;
+}
+
+/* Start label */
+.startLabel {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  opacity: 0.8;
+}
+
+/* Node circle */
+.node {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-apple),
+    border-color var(--duration-fast) var(--ease-apple),
+    transform var(--duration-fast) var(--ease-spring),
+    opacity var(--duration-fast) var(--ease-apple);
+}
+
+.node:hover {
+  transform: scale(1.1);
+}
+
+.node:active {
+  transform: scale(0.95);
+}
+
+.node:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px var(--color-accent-glow);
+}
+
+/* ── State: completed ─────────────────────────────────────────────── */
+.completed {
+  background-color: var(--color-accent);
+  border: 2px solid var(--color-accent-hover);
+  color: #FFFFFF;
+}
+
+.completed:hover {
+  background-color: var(--color-accent-hover);
+}
+
+/* ── State: current ──────────────────────────────────────────────── */
+.current {
+  background-color: var(--color-accent);
+  border: 2px solid #FFFFFF;
+  color: #FFFFFF;
+  box-shadow: 0 0 0 4px var(--color-accent-glow);
+}
+
+.current:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+}
+
+/* ── State: locked ───────────────────────────────────────────────── */
+.locked {
+  background-color: var(--color-bg-surface);
+  border: 2px solid var(--color-border-subtle);
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.locked:hover {
+  transform: none;
+}
+
+.lockIcon {
+  font-size: 0.6rem;
+}
+
+/* Mission title */
+.title {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+  max-width: 120px;
+  line-height: var(--leading-snug);
+}
+
+.titleLocked {
+  opacity: 0.4;
+}
+
+/* XP badge */
+.xpBadge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-elevated);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+/* Vertical connector line */
+.connector {
+  width: 2px;
+  height: 28px;
+  background-color: var(--color-border-subtle);
+  border-radius: 1px;
+}
+
+.connectorLocked {
+  opacity: 0.3;
+}

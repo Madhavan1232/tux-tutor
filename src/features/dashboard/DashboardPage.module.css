@@ -1,0 +1,41 @@
+/* Rail divider */
+.railDivider {
+  height: 1px;
+  background-color: var(--color-border-subtle);
+  margin: 0 calc(-1 * var(--space-4));
+}
+
+/* Loading state */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: var(--space-6);
+}
+
+.loadingText {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  letter-spacing: var(--tracking-wide);
+  margin: 0;
+}
+
+/* Skip-to-content link (keyboard accessibility) */
+.skipLink {
+  position: absolute;
+  top: -100px;
+  left: var(--space-6);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-accent);
+  color: #FFFFFF;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  z-index: 999;
+  transition: top var(--duration-fast) var(--ease-apple);
+}
+
+.skipLink:focus {
+  top: var(--space-4);
+}

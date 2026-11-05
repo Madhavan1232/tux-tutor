@@ -1,0 +1,83 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-bg-base);
+}
+
+.body {
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex: 1;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Center / Main ──────────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-10) var(--space-8);
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+/* ── Right Rail ─────────────────────────────────────────────────────── */
+.rail {
+  width: var(--rail-width);
+  flex-shrink: 0;
+  padding: var(--space-10) var(--space-6) var(--space-10) var(--space-4);
+  border-left: 1px solid var(--color-border-subtle);
+  overflow-y: auto;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* ── Tablet: rail drops below ────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .body {
+    flex-direction: column;
+  }
+
+  .rail {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--color-border-subtle);
+    max-height: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    padding: var(--space-6) var(--space-8);
+    overflow-y: visible;
+  }
+
+  .rail > * {
+    flex: 1 1 calc(50% - var(--space-6));
+    min-width: 220px;
+  }
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .body {
+    margin-left: 0;
+    padding-bottom: 60px;
+  }
+
+  .main {
+    padding: var(--space-6) var(--space-4);
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .rail {
+    padding: var(--space-4);
+    flex-direction: column;
+  }
+
+  .rail > * {
+    flex: none;
+    min-width: unset;
+  }
+}

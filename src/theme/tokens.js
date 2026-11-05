@@ -1,12 +1,47 @@
+// =============================================================================
+// TUX TUTOR — JavaScript Color Tokens (v2 — Apple-Style Design Language)
+// Single source of truth for JS-side color references.
+// Always reference these — never hardcode hex values.
+// =============================================================================
+
+export const colors = {
+  bg: {
+    base:     '#0D0D0D',
+    surface:  '#1A1A1A',
+    elevated: '#222222',
+  },
+  border: {
+    subtle: '#2A2A2A',
+    focus:  '#E8192C',
+  },
+  text: {
+    primary:   '#F0F0F0',
+    secondary: '#A0A0A0',
+    muted:     '#666666',
+  },
+  accent: {
+    default: '#E8192C',
+    hover:   '#FF2D3F',
+    muted:   '#7A0A14',
+    glow:    'rgba(232, 25, 44, 0.25)',
+  },
+  feedback: {
+    success: '#22C55E',
+    error:   '#FF4444',
+    warning: '#F59E0B',
+  },
+};
+
+// Legacy export — kept for backward compatibility
 export const COLORS = {
-  background: '#000000',
-  primary: '#770600',
-  surface: '#161414',
-  secondaryRed: '#7A0401',
-  darkBurgundy: '#4D0B08',
-  deepRed: '#170001',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#BCB3B3',
+  background:    colors.bg.base,
+  primary:       colors.accent.default,
+  surface:       colors.bg.surface,
+  secondaryRed:  colors.accent.hover,
+  darkBurgundy:  colors.accent.muted,
+  deepRed:       colors.accent.muted,
+  textPrimary:   colors.text.primary,
+  textSecondary: colors.text.secondary,
 };
 
 export const WORLDS = [
@@ -67,4 +102,3 @@ export const WORLDS = [
     totalMissions: 14,
   },
 ];
-
