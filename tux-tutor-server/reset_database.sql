@@ -1,89 +1,122 @@
 -- ============================================================================
 -- TUX TUTOR DATABASE RESET SCRIPT (PostgreSQL)
--- Description: Drops all existing tables and recreates them fresh according to
---              the Prisma schema specification.
--- Database:    tux_tutor_db (schema: public)
+-- Description: Drops and recreates all tables according to schema.prisma
+-- Target DB:   Configured via DATABASE_URL in tux-tutor-server/.env
 -- ============================================================================
 
 BEGIN;
 
 -- ----------------------------------------------------------------------------
--- STEP 1: DROP ALL EXISTING TABLES & SEQUENCES
+-- STEP 1: DROP ALL EXISTING TABLES & TYPES
 -- ----------------------------------------------------------------------------
+DROP TABLE IF EXISTS "LoginLog" CASCADE;
+DROP TABLE IF EXISTS "XpEvent" CASCADE;
 DROP TABLE IF EXISTS "UserMission" CASCADE;
 DROP TABLE IF EXISTS "Achievement" CASCADE;
 DROP TABLE IF EXISTS "Otp" CASCADE;
 DROP TABLE IF EXISTS "PasswordResetToken" CASCADE;
 DROP TABLE IF EXISTS "User" CASCADE;
 DROP TABLE IF EXISTS "Mission" CASCADE;
+DROP TABLE IF EXISTS "World" CASCADE;
 DROP TABLE IF EXISTS "_prisma_migrations" CASCADE;
+DROP TYPE IF EXISTS "MissionType" CASCADE;
 
 -- ----------------------------------------------------------------------------
--- STEP 2: CREATE FRESH TABLES
+-- STEP 2: CREATE TYPES & FRESH TABLES
 -- ----------------------------------------------------------------------------
+CREATE TYPE "MissionType" AS ENUM ('mission', 'boss');
 
 -- 1. User Table
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "password" TEXT,
+    "github_id" TEXT,
+    "google_id" TEXT,
     "xp" INTEGER NOT NULL DEFAULT 0,
     "level" INTEGER NOT NULL DEFAULT 1,
     "streak" INTEGER NOT NULL DEFAULT 0,
+    "streak_current" INTEGER NOT NULL DEFAULT 0,
+    "streak_best" INTEGER NOT NULL DEFAULT 0,
+    "last_active_date" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
--- Unique indexes for User
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "User_github_id_key" ON "User"("github_id");
+CREATE UNIQUE INDEX "User_google_id_key" ON "User"("google_id");
 
+-- 2. World Table
+CREATE TABLE "World" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "order_index" INTEGER NOT NULL,
+    "unlock_requirement" INTEGER NOT NULL DEFAULT 0,
 
--- 2. Mission Table
+    CONSTRAINT "World_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "World_order_index_key" ON "World"("order_index");
+
+-- 3. Mission Table
 CREATE TABLE "Mission" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "world" TEXT NOT NULL,
-    "xpReward" INTEGER NOT NULL DEFAULT 10,
+    "world" TEXT,
+    "world_id" INTEGER,
+    "order_index" INTEGER NOT NULL DEFAULT 0,
+    "type" "MissionType" NOT NULL DEFAULT 'mission',
+    "xp_reward" INTEGER NOT NULL DEFAULT 50,
     "command" TEXT NOT NULL,
     "expectedOutput" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "Mission_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Mission_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "Mission_world_id_fkey" FOREIGN KEY ("world_id") REFERENCES "World"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
--- 3. UserMission (Join table for User <-> Mission progress)
+-- 4. UserMission Table
 CREATE TABLE "UserMission" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "missionId" INTEGER NOT NULL,
-    "completedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "user_id" INTEGER NOT NULL,
+    "mission_id" INTEGER NOT NULL,
+    "completed_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "UserMission_pkey" PRIMARY KEY ("id"),
-    CONSTRAINT "UserMission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "UserMission_missionId_fkey" FOREIGN KEY ("missionId") REFERENCES "Mission"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT "UserMission_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "UserMission_mission_id_fkey" FOREIGN KEY ("mission_id") REFERENCES "Mission"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Unique composite index to prevent duplicate mission completions
-CREATE UNIQUE INDEX "UserMission_userId_missionId_key" ON "UserMission"("userId", "missionId");
+CREATE UNIQUE INDEX "UserMission_user_id_mission_id_key" ON "UserMission"("user_id", "mission_id");
 
+-- 5. XpEvent Table
+CREATE TABLE "XpEvent" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
--- 4. Achievement Table
+    CONSTRAINT "XpEvent_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "XpEvent_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- 6. Achievement Table
 CREATE TABLE "Achievement" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "badge" TEXT NOT NULL,
-    "earnedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "earned_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Achievement_pkey" PRIMARY KEY ("id"),
-    CONSTRAINT "Achievement_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT "Achievement_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
--- 5. Otp Table (Email Verification & Passwordless Auth)
+-- 7. Otp Table
 CREATE TABLE "Otp" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
@@ -96,11 +129,9 @@ CREATE TABLE "Otp" (
     CONSTRAINT "Otp_pkey" PRIMARY KEY ("id")
 );
 
--- Index for fast lookup by email and creation timestamp
 CREATE INDEX "Otp_email_createdAt_idx" ON "Otp"("email", "createdAt");
 
-
--- 6. PasswordResetToken Table
+-- 8. PasswordResetToken Table
 CREATE TABLE "PasswordResetToken" (
     "id" SERIAL NOT NULL,
     "token" TEXT NOT NULL,
@@ -116,62 +147,18 @@ CREATE UNIQUE INDEX "PasswordResetToken_token_key" ON "PasswordResetToken"("toke
 CREATE INDEX "PasswordResetToken_token_idx" ON "PasswordResetToken"("token");
 CREATE INDEX "PasswordResetToken_userId_idx" ON "PasswordResetToken"("userId");
 
+-- 9. LoginLog Table
+CREATE TABLE "LoginLog" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "ip_address" TEXT NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "success" BOOLEAN NOT NULL,
 
--- ----------------------------------------------------------------------------
--- STEP 3: SEED STARTER MISSIONS (World 001 - Directory Navigation)
--- ----------------------------------------------------------------------------
-INSERT INTO "Mission" ("title", "description", "world", "xpReward", "command", "expectedOutput")
-VALUES
-    (
-        'Inspect Working Directory',
-        'Print the absolute path of your current operative working directory.',
-        '001.navigation',
-        10,
-        'pwd',
-        '/home/tux/academy'
-    ),
-    (
-        'Examine System Kernel',
-        'Inspect the active Linux kernel architecture and build specifications.',
-        '001.navigation',
-        15,
-        'uname -r',
-        '6.8.0-tux-x86_64'
-    ),
-    (
-        'List Directory Contents',
-        'List all files including hidden dotfiles and detailed permissions.',
-        '001.navigation',
-        10,
-        'ls -la',
-        'drwxr-xr-x 2 tux tux 4096'
-    ),
-    (
-        'Verify Operative Identity',
-        'Display your current effective user name and security group assignments.',
-        '001.navigation',
-        10,
-        'whoami',
-        'tux'
-    ),
-    (
-        'Read Mission Briefing',
-        'Display the contents of the primary mission directive file.',
-        '001.navigation',
-        20,
-        'cat mission.txt',
-        'MODULE 001: Traverse directory tree using cd and inspect logs.'
-    );
+    CONSTRAINT "LoginLog_pkey" PRIMARY KEY ("id")
+);
+
+CREATE INDEX "LoginLog_email_idx" ON "LoginLog"("email");
+CREATE INDEX "LoginLog_timestamp_idx" ON "LoginLog"("timestamp");
 
 COMMIT;
-
--- ----------------------------------------------------------------------------
--- VERIFICATION
--- ----------------------------------------------------------------------------
-SELECT 
-    table_name,
-    (SELECT count(*) FROM information_schema.columns WHERE table_name = t.table_name) AS column_count
-FROM information_schema.tables t
-WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
-ORDER BY table_name;
-

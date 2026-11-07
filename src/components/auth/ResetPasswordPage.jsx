@@ -4,14 +4,9 @@ import { Eye, EyeOff, Info, CheckCircle2, AlertTriangle, SquareChevronRight } fr
 import tuxLogo from "../../assets/logo.png"
 
 const API_BASE_URL = "http://localhost:5000/api/auth"
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/
 
 const PASSWORD_RULES = [
-    { id: "length", label: "8+ characters", test: (pwd) => pwd.length >= 8 },
-    { id: "uppercase", label: "Uppercase letter", test: (pwd) => /[A-Z]/.test(pwd) },
-    { id: "lowercase", label: "Lowercase letter", test: (pwd) => /[a-z]/.test(pwd) },
-    { id: "number", label: "Number", test: (pwd) => /\d/.test(pwd) },
-    { id: "symbol", label: "Symbol (!@#$%...)", test: (pwd) => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd) },
+    { id: "length", label: "At least 8 characters", test: (pwd) => pwd.length >= 8 },
 ]
 
 function CrimsonSpinner({ size = 16, color = "currentColor" }) {
@@ -81,30 +76,25 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
         }
     }, [token])
 
-    // Password criteria evaluation
+    // Password criteria evaluation (min 8 characters)
     const rulesMet = PASSWORD_RULES.map((rule) => ({
         ...rule,
         met: rule.test(newPassword),
     }))
-    const rulesMetCount = rulesMet.filter((r) => r.met).length
     const hasSpaces = /\s/.test(newPassword)
-    const isNewPasswordValid = PASSWORD_REGEX.test(newPassword) && !hasSpaces
+    const isNewPasswordValid = newPassword.length >= 8 && !hasSpaces
 
     let strengthLabel = ""
     let strengthColor = "transparent"
     let barWidthPercent = 0
 
     if (newPassword.length > 0) {
-        if (rulesMetCount <= 2) {
-            strengthLabel = "Weak"
+        if (newPassword.length < 8) {
+            strengthLabel = "Too short"
             strengthColor = "#DC2626"
-            barWidthPercent = rulesMetCount === 1 ? 25 : 40
-        } else if (rulesMetCount <= 4) {
-            strengthLabel = "Fair"
-            strengthColor = "#D97706"
-            barWidthPercent = rulesMetCount === 3 ? 65 : 80
+            barWidthPercent = Math.min(85, Math.round((newPassword.length / 8) * 100))
         } else {
-            strengthLabel = "Strong"
+            strengthLabel = "Valid"
             strengthColor = "#15803D"
             barWidthPercent = 100
         }
@@ -118,7 +108,7 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
         setError("")
 
         if (!newPassword || !isNewPasswordValid) {
-            setError("Please create a password that meets all security requirements.")
+            setError(hasSpaces ? "Password cannot contain spaces." : "Password must be at least 8 characters long.")
             return
         }
 

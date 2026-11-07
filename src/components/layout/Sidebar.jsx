@@ -1,5 +1,7 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import Tux from '../ui/Tux';
+import { UserButton } from '../UserButton';
+import { useAuth } from '../../context/AuthContext';
 import styles from './Sidebar.module.css';
 
 const NAV_ITEMS = [
@@ -16,14 +18,37 @@ const NAV_ITEMS = [
  * Sidebar — desktop left navigation + mobile bottom tab bar.
  * Apple-style white surface, dark text, and crimson active state.
  */
-export default function Sidebar() {
+export default function Sidebar({ currentUser: propUser, onSignOut: propSignOut }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const auth = useAuth();
+
+  // Context takes priority; props serve as explicit overrides (for pages that still pass them)
+  const currentUser = propUser ?? auth.currentUser;
+  const authSignOut = propSignOut ?? auth.onSignOut;
 
   const handleSignOut = () => {
     localStorage.removeItem('tux_user');
+    localStorage.removeItem('tux_token');
     localStorage.removeItem('token');
-    window.location.href = '/';
+    if (authSignOut) {
+      authSignOut();
+    } else {
+      window.location.href = '/';
+    }
   };
+
+  // Derive user display data
+  const name = currentUser?.name || currentUser?.username || currentUser?.email?.split('@')[0] || 'User';
+  const email = currentUser?.email || '';
+  const level = currentUser?.level ?? 1;
+  const xp = currentUser?.xp ?? 0;
+  const avatarInitials = name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
 
   return (
     <>
@@ -55,16 +80,19 @@ export default function Sidebar() {
           </ul>
         </nav>
 
-        {/* Footer */}
-        <div className={styles.sidebarFooter}>
-          <button
-            type="button"
-            className={styles.signOutBtn}
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </button>
-          <span className={styles.version}>v0.1</span>
+        {/* Footer — UserButton replaces old Sign Out */}
+        <div className={styles.sidebarFooter} style={{ flexDirection: 'column', alignItems: 'stretch', gap: '4px', padding: '12px 8px 10px' }}>
+          <UserButton
+            name={name}
+            email={email}
+            avatarInitials={avatarInitials || 'TT'}
+            level={level}
+            xp={xp}
+            onSignOut={handleSignOut}
+            onViewProfile={() => navigate('/profile')}
+            onSettings={() => navigate('/settings')}
+          />
+          <span className={styles.version} style={{ textAlign: 'center', paddingBottom: '2px' }}>v0.1</span>
         </div>
       </aside>
 

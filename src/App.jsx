@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './components/auth/AuthPage';
 import ResetPasswordPage from './components/auth/ResetPasswordPage';
 import DashboardPage from './features/dashboard/DashboardPage';
+import SidebarPreviewPage from './features/sidebar-preview/SidebarPreviewPage';
 import AppShell from './components/layout/AppShell';
+import { AuthContext } from './context/AuthContext';
 import tuxLogo from './assets/logo.png';
 import styles from './App.module.css';
 
@@ -36,9 +38,10 @@ export default function App() {
     }
   });
 
-  // URL route parsing for password reset link
+  // URL route parsing for password reset link — strictly active on /reset-password
   const [resetToken, setResetToken] = useState(() => {
     try {
+      if (!window.location.pathname.includes('reset-password')) return '';
       const params = new URLSearchParams(window.location.search);
       return params.get('token') || '';
     } catch {
@@ -48,9 +51,7 @@ export default function App() {
 
   const [isResetRoute, setIsResetRoute] = useState(() => {
     try {
-      const isPath = window.location.pathname.includes('reset-password');
-      const params = new URLSearchParams(window.location.search);
-      return isPath || params.has('token');
+      return window.location.pathname.includes('reset-password');
     } catch {
       return false;
     }
@@ -164,39 +165,42 @@ export default function App() {
 
   // Authenticated Learning Dashboard & Terminal
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/terminal" element={<Placeholder title="Terminal" />} />
-        <Route path="/badges" element={<Placeholder title="Badges" />} />
-        <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
-        <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
-        <Route
-          path="/profile"
-          element={
-            <AppShell>
-              <div className={styles.placeholder}>
-                <span className={styles.placeholderOverline}>Active Session</span>
-                <h1 className={styles.placeholderTitle}>{currentUser.email || currentUser.username}</h1>
-                <p className={styles.placeholderText}>
-                  Authenticated operative ID: <code>UID: 1000</code>
-                </p>
-                <button
-                  type="button"
-                  className="apple-btn-secondary"
-                  onClick={handleSignOut}
-                  style={{ marginTop: '16px' }}
-                >
-                  Sign Out
-                </button>
-              </div>
-            </AppShell>
-          }
-        />
-        <Route path="/settings" element={<Placeholder title="Settings" />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthContext.Provider value={{ currentUser, onSignOut: handleSignOut }}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/sidebar" element={<SidebarPreviewPage currentUser={currentUser} />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/terminal" element={<Placeholder title="Terminal" />} />
+          <Route path="/badges" element={<Placeholder title="Badges" />} />
+          <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
+          <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
+          <Route
+            path="/profile"
+            element={
+              <AppShell>
+                <div className={styles.placeholder}>
+                  <span className={styles.placeholderOverline}>Active Session</span>
+                  <h1 className={styles.placeholderTitle}>{currentUser.email || currentUser.username}</h1>
+                  <p className={styles.placeholderText}>
+                    Authenticated operative ID: <code>UID: 1000</code>
+                  </p>
+                  <button
+                    type="button"
+                    className="apple-btn-secondary"
+                    onClick={handleSignOut}
+                    style={{ marginTop: '16px' }}
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </AppShell>
+            }
+          />
+          <Route path="/settings" element={<Placeholder title="Settings" />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthContext.Provider>
   );
 }

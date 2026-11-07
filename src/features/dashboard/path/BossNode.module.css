@@ -1,117 +1,277 @@
 .wrapper {
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
+  transform: translate(-50%, -50%);
+  width: 170px;
+  z-index: 6;
+  user-select: none;
 }
 
-.connector {
-  width: 2px;
-  height: 28px;
-  background-color: var(--color-accent);
-  border-radius: 1px;
+/* ── 1. Floating Boss Battle Badge ──────────────────────────────────── */
+.bossBadge {
+  position: absolute;
+  bottom: calc(100% + 28px);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #1A0E02;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5), 0 0 10px rgba(254, 240, 138, 0.5);
+  border: 1px solid #FEF08A;
+  animation: bounceFloat 2s ease-in-out infinite;
+  white-space: nowrap;
 }
 
-.connector.locked {
-  background-color: var(--color-border-subtle);
-  opacity: 0.6;
+.sparkleIcon {
+  animation: rotateSparkle 3s linear infinite;
 }
 
+@keyframes bounceFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes rotateSparkle {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── 2. Tux Slot ────────────────────────────────────────────────────── */
 .tuxSlot {
-  margin-bottom: var(--space-1);
+  margin-bottom: -4px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  transition: transform 200ms ease;
 }
 
-/* Boss diamond node */
-.node {
-  width: 70px;
-  height: 70px;
+.wrapper:hover .tuxSlot {
+  transform: translateY(-2px);
+}
+
+/* ── 3. Node Container & Pulsing Golden Aura ────────────────────────── */
+.nodeContainer {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-bg-surface);
-  border: 2px solid var(--color-accent);
+}
+
+.goldPulseRing {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid #F59E0B;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+  pointer-events: none;
+  animation: goldPulse 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+}
+
+.goldPulseRingDelayed {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid #FBBF24;
+  pointer-events: none;
+  animation: goldPulse 2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
+  animation-delay: 1s;
+}
+
+@keyframes goldPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* ── 4. The Grand Boss Node Button (Larger Circle) ──────────────────── */
+.node {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  outline: none;
+  border: 3px solid transparent;
   transition:
-    background-color var(--duration-fast) var(--ease-apple),
-    border-color var(--duration-fast) var(--ease-apple),
-    transform var(--duration-fast) var(--ease-spring),
-    box-shadow var(--duration-fast) var(--ease-apple);
+    transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 220ms ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
 }
 
-.node:hover {
-  transform: scale(1.08) rotate(5deg);
+.node:hover:not(:disabled) {
+  transform: scale(1.1);
 }
 
-.node:active {
+.node:active:not(:disabled) {
   transform: scale(0.95);
 }
 
 .node:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 5px;
-  border-radius: 0;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.5), 0 0 0 2px #FFFFFF;
 }
 
-/* Completed */
+/* ── Boss State: Completed (Radiant Gold Victory) ──────────────────── */
 .nodeCompleted {
-  background-color: var(--color-accent);
-  border-color: #FFFFFF;
-  box-shadow: 0 2px 12px rgba(220, 38, 38, 0.3);
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 60%, #B45309 100%);
+  border-color: #FEF08A;
+  color: #FFFFFF;
+  box-shadow:
+    0 4px 22px rgba(245, 158, 11, 0.5),
+    inset 0 3px 6px rgba(255, 255, 255, 0.5),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Current */
+.iconCompletedWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.starSparkle {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  color: #FEF08A;
+  animation: rotateSparkle 4s linear infinite;
+}
+
+/* ── Boss State: Current / Active (Glowing Royal Gold Aura) ─────────── */
 .nodeCurrent {
-  background-color: var(--color-accent);
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 50%, #D97706 100%);
   border-color: #FFFFFF;
-  box-shadow: 0 0 0 6px var(--color-accent-glow), 0 4px 16px rgba(220, 38, 38, 0.4);
+  color: #1A0E02;
+  box-shadow:
+    0 0 30px rgba(245, 158, 11, 0.7),
+    0 6px 26px rgba(0, 0, 0, 0.5),
+    inset 0 3px 6px rgba(255, 255, 255, 0.6);
+  animation: bossAura 2s ease-in-out infinite;
 }
 
-/* Locked */
+@keyframes bossAura {
+  0%, 100% {
+    box-shadow:
+      0 0 22px rgba(245, 158, 11, 0.6),
+      0 6px 24px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 36px rgba(245, 158, 11, 0.85),
+      0 8px 30px rgba(0, 0, 0, 0.6);
+  }
+}
+
+.iconCurrentWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1A0E02;
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.4));
+}
+
+/* ── Boss State: Locked (Dark Bronze / Slate Fortress) ──────────────── */
 .nodeLocked {
-  background-color: var(--color-bg-elevated);
-  border-color: var(--color-border-subtle);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(245, 158, 11, 0.2);
+  color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
 }
 
 .nodeLocked:hover {
   transform: none;
 }
 
-/* Inner symbol */
-.diamond {
-  font-family: var(--font-mono);
-  font-size: 1.25rem;
-  font-weight: var(--weight-bold);
-  color: #FFFFFF;
+.iconLockedWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.35);
 }
 
-.nodeLocked .diamond {
-  color: var(--color-text-muted);
+/* ── 5. Boss Label Group ────────────────────────────────────────────── */
+.labelGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
-/* Label */
+.bossOverline {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #F59E0B;
+  text-transform: uppercase;
+}
+
 .label {
-  font-size: var(--text-xs);
-  color: var(--color-text-primary);
-  font-weight: var(--weight-semibold);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: #F8FAFC;
   text-align: center;
-  letter-spacing: var(--tracking-wide);
+  max-width: 150px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .labelLocked {
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.4);
 }
 
-.xp {
+/* ── 6. Gold XP Reward Pill ─────────────────────────────────────────── */
+.xpBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: var(--weight-semibold);
-  letter-spacing: var(--tracking-wide);
-  color: var(--color-accent);
-  background-color: #FFFFFF;
-  border: 1px solid rgba(220, 38, 38, 0.2);
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  user-select: none;
+  backdrop-filter: blur(6px);
+}
+
+.xpIcon {
+  flex-shrink: 0;
+}
+
+.xpBadgeActive {
+  color: #FEF08A;
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+}
+
+.xpBadgeLocked {
+  color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }

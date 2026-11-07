@@ -5,14 +5,9 @@ import tuxLogo from "../../assets/logo.png"
 
 const API_BASE_URL = "http://localhost:5000/api/auth"
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/
 
 const PASSWORD_RULES = [
-    { id: "length", label: "8+ characters", test: (pwd) => pwd.length >= 8 },
-    { id: "uppercase", label: "Uppercase letter", test: (pwd) => /[A-Z]/.test(pwd) },
-    { id: "lowercase", label: "Lowercase letter", test: (pwd) => /[a-z]/.test(pwd) },
-    { id: "number", label: "Number", test: (pwd) => /\d/.test(pwd) },
-    { id: "symbol", label: "Symbol (!@#$%...)", test: (pwd) => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd) },
+    { id: "length", label: "At least 8 characters", test: (pwd) => pwd.length >= 8 },
 ]
 
 function CrimsonSpinner({ size = 16, color = "currentColor" }) {
@@ -22,6 +17,35 @@ function CrimsonSpinner({ size = 16, color = "currentColor" }) {
             style={{ width: size, height: size, borderTopColor: color }}
             aria-hidden="true"
         />
+    )
+}
+
+function GoogleLogo({ size = 18 }) {
+    return (
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            style={{ display: "inline-block", verticalAlign: "middle", flexShrink: 0 }}
+            aria-hidden="true"
+        >
+            <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+            />
+            <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+            />
+        </svg>
     )
 }
 
@@ -128,6 +152,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
     const [resetNotice, setResetNotice] = useState("")
     const [isSendingReset, setIsSendingReset] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false)
     const loginPasswordInputRef = useRef(null)
     const signupPasswordInputRef = useRef(null)
     const emailInputRef = useRef(null)
@@ -140,30 +165,25 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
     const [otpCode, setOtpCode] = useState("")
     const [resendCountdown, setResendCountdown] = useState(0)
 
-    // Password validation
+    // Password validation (min 8 characters)
     const rulesMet = PASSWORD_RULES.map((rule) => ({
         ...rule,
         met: rule.test(password),
     }))
-    const rulesMetCount = rulesMet.filter((r) => r.met).length
     const hasSpaces = /\s/.test(password)
-    const isPasswordValid = PASSWORD_REGEX.test(password) && !hasSpaces
+    const isPasswordValid = password.length >= 8 && !hasSpaces
 
     let strengthLabel = ""
     let strengthColor = "transparent"
     let barWidthPercent = 0
 
     if (password.length > 0) {
-        if (rulesMetCount <= 2) {
-            strengthLabel = "Weak"
+        if (password.length < 8) {
+            strengthLabel = "Too short"
             strengthColor = "#DC2626"
-            barWidthPercent = rulesMetCount === 1 ? 25 : 40
-        } else if (rulesMetCount <= 4) {
-            strengthLabel = "Fair"
-            strengthColor = "#D97706"
-            barWidthPercent = rulesMetCount === 3 ? 65 : 80
+            barWidthPercent = Math.min(85, Math.round((password.length / 8) * 100))
         } else {
-            strengthLabel = "Strong"
+            strengthLabel = "Valid"
             strengthColor = "#15803D"
             barWidthPercent = 100
         }
@@ -182,6 +202,52 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
         const mins = Math.floor(seconds / 60)
         const secs = seconds % 60
         return `${mins}:${secs.toString().padStart(2, "0")}`
+    }
+
+    // Process OAuth return parameters (from real Google OAuth callback redirect)
+    useEffect(() => {
+        try {
+            const params = new URLSearchParams(window.location.search)
+            const token = params.get("auth_token") || params.get("token")
+            const authError = params.get("auth_error") || params.get("error")
+
+            if (token) {
+                setIsSuccess(true)
+                localStorage.setItem("tux_token", token)
+                fetch(`${API_BASE_URL}/me`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (data.user) {
+                            window.history.replaceState({}, document.title, window.location.pathname)
+                            onAuthSuccess(data.user)
+                        } else {
+                            throw new Error("User session not found")
+                        }
+                    })
+                    .catch(() => {
+                        setIsSuccess(false)
+                        setError("Failed to retrieve profile from Google sign-in.")
+                    })
+            } else if (authError) {
+                setError(decodeURIComponent(authError))
+                window.history.replaceState({}, document.title, window.location.pathname)
+            }
+        } catch {
+            // ignore
+        }
+    }, [onAuthSuccess])
+
+    const handleGoogleSignIn = () => {
+        setError("")
+        setIsGoogleLoading(true)
+        try {
+            window.location.href = `${API_BASE_URL}/google`
+        } catch {
+            setIsGoogleLoading(false)
+            setError("Could not connect to Google sign-in. Please try again.")
+        }
     }
 
     // Duplicate email check for signup (on blur or before submit)
@@ -392,7 +458,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
         }
 
         if (!password || !isPasswordValid) {
-            setError("Please choose a password meeting all security requirements.")
+            setError(hasSpaces ? "Password cannot contain spaces." : "Password must be at least 8 characters long.")
             return
         }
 
@@ -662,11 +728,35 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     )}
 
                                     {error && (
-                                        <div className="apple-alert-box apple-alert-error" role="alert">
-                                            <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                            </svg>
-                                            <span>{error}</span>
+                                        <div className="apple-alert-box apple-alert-error" role="alert" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
+                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', width: '100%' }}>
+                                                <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor" style={{ marginTop: '2px', flexShrink: 0 }}>
+                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                </svg>
+                                                <span style={{ flex: 1 }}>{error}</span>
+                                            </div>
+                                            {error.includes("Google") && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleGoogleSignIn}
+                                                    style={{
+                                                        marginLeft: '26px',
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        padding: 0,
+                                                        color: 'var(--color-accent)',
+                                                        fontSize: '12.5px',
+                                                        fontWeight: 600,
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer',
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px'
+                                                    }}
+                                                >
+                                                    Sign in with Google now →
+                                                </button>
+                                            )}
                                         </div>
                                     )}
 
@@ -777,6 +867,34 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                 "Sign In"
                                             )}
                                         </button>
+
+                                        {/* Divider with "OR" */}
+                                        <div className="apple-auth-divider" role="separator" aria-label="or">
+                                            <span className="apple-auth-divider-line" />
+                                            <span className="apple-auth-divider-text">OR</span>
+                                            <span className="apple-auth-divider-line" />
+                                        </div>
+
+                                        {/* Continue with Google */}
+                                        <button
+                                            type="button"
+                                            onClick={handleGoogleSignIn}
+                                            disabled={loading || isSuccess || isGoogleLoading}
+                                            className="apple-btn-google full-width"
+                                            aria-label="Continue with Google"
+                                        >
+                                            {isGoogleLoading ? (
+                                                <>
+                                                    <CrimsonSpinner size={16} color="#6E6E73" />
+                                                    <span>Connecting to Google...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <GoogleLogo size={18} />
+                                                    <span>Continue with Google</span>
+                                                </>
+                                            )}
+                                        </button>
                                     </form>
 
                                     <div className="apple-card-footer">
@@ -810,20 +928,41 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     </div>
 
                                     {error && (
-                                        <div className="apple-alert-box apple-alert-error" role="alert">
-                                            <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                            </svg>
-                                            <span>{error}</span>
+                                        <div className="apple-alert-box apple-alert-error" role="alert" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
+                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', width: '100%' }}>
+                                                <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor" style={{ marginTop: '2px', flexShrink: 0 }}>
+                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                </svg>
+                                                <span style={{ flex: 1 }}>{error}</span>
+                                            </div>
+                                            {error.includes("Google") && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleGoogleSignIn}
+                                                    style={{
+                                                        marginLeft: '26px',
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        padding: 0,
+                                                        color: 'var(--color-accent)',
+                                                        fontSize: '12.5px',
+                                                        fontWeight: 600,
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer',
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px'
+                                                    }}
+                                                >
+                                                    Sign in with Google now →
+                                                </button>
+                                            )}
                                         </div>
                                     )}
 
                                     {emailExistsState === "EXISTS" && (
-                                        <div className="apple-alert-box apple-alert-warning" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#FEF2F2', border: '0.5px solid #FECACA', borderRadius: '14px', padding: '12px 16px', marginBottom: '14px' }}>
-                                            <div className="apple-dup-text" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                                <strong style={{ fontWeight: 600, color: '#1D1D1F', fontSize: '13.5px' }}>Account already exists</strong>
-                                                <span className="apple-caption" style={{ color: '#6E6E73', fontSize: '12.5px' }}>An account with this email is already registered.</span>
-                                            </div>
+                                        <p style={{ fontSize: '12.5px', color: '#6E6E73', margin: '-6px 0 10px 2px', lineHeight: '1.5' }}>
+                                            This email is already registered.{" "}
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -832,12 +971,11 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                     setPassword("")
                                                     setError("")
                                                 }}
-                                                className="apple-btn-primary apple-caption"
-                                                style={{ padding: '8px 18px', height: 'auto', fontSize: '13.5px', borderRadius: '9999px', whiteSpace: 'nowrap' }}
+                                                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#dc2626', fontSize: '12.5px', fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: '2px' }}
                                             >
-                                                Sign In →
+                                                Sign in instead?
                                             </button>
-                                        </div>
+                                        </p>
                                     )}
 
 
@@ -1007,6 +1145,34 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                 "Create account"
                                             )}
                                         </button>
+
+                                        {/* Divider with "OR" */}
+                                        <div className="apple-auth-divider" role="separator" aria-label="or">
+                                            <span className="apple-auth-divider-line" />
+                                            <span className="apple-auth-divider-text">OR</span>
+                                            <span className="apple-auth-divider-line" />
+                                        </div>
+
+                                        {/* Continue with Google */}
+                                        <button
+                                            type="button"
+                                            onClick={handleGoogleSignIn}
+                                            disabled={loading || isCheckingEmail || isGoogleLoading}
+                                            className="apple-btn-google full-width"
+                                            aria-label="Continue with Google"
+                                        >
+                                            {isGoogleLoading ? (
+                                                <>
+                                                    <CrimsonSpinner size={16} color="#6E6E73" />
+                                                    <span>Connecting to Google...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <GoogleLogo size={18} />
+                                                    <span>Continue with Google</span>
+                                                </>
+                                            )}
+                                        </button>
                                     </form>
 
                                     <div className="apple-card-footer">
@@ -1041,11 +1207,35 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     </div>
 
                                     {error && (
-                                        <div className="apple-alert-box apple-alert-error" role="alert">
-                                            <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                            </svg>
-                                            <span>{error}</span>
+                                        <div className="apple-alert-box apple-alert-error" role="alert" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
+                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', width: '100%' }}>
+                                                <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor" style={{ marginTop: '2px', flexShrink: 0 }}>
+                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                </svg>
+                                                <span style={{ flex: 1 }}>{error}</span>
+                                            </div>
+                                            {error.includes("Google") && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleGoogleSignIn}
+                                                    style={{
+                                                        marginLeft: '26px',
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        padding: 0,
+                                                        color: 'var(--color-accent)',
+                                                        fontSize: '12.5px',
+                                                        fontWeight: 600,
+                                                        textDecoration: 'underline',
+                                                        cursor: 'pointer',
+                                                        display: 'inline-flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px'
+                                                    }}
+                                                >
+                                                    Sign in with Google now →
+                                                </button>
+                                            )}
                                         </div>
                                     )}
 
@@ -1116,6 +1306,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     </div>
                 </section>
             </main>
+
+
 
             {/* Apple Store-Style Scoped Styles */}
             <style>{`
@@ -1623,6 +1815,95 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     height: 48px !important;
                     font-size: 16px !important;
                     font-weight: 600 !important;
+                }
+
+                /* OR Divider */
+                .apple-auth-divider {
+                    display: flex;
+                    align-items: center;
+                    margin: 14px 0 12px;
+                    gap: 12px;
+                }
+
+                .apple-auth-divider-line {
+                    flex: 1;
+                    height: 1px;
+                    background-color: var(--color-border-subtle, #D2D2D7);
+                    opacity: 0.8;
+                }
+
+                .apple-auth-divider-text {
+                    font-size: 11.5px;
+                    font-weight: 600;
+                    color: var(--color-text-secondary, #6E6E73);
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                }
+
+                /* Google OAuth Button */
+                button.apple-btn-google,
+                .apple-btn-google {
+                    background-color: #FFFFFF !important;
+                    color: var(--color-text-primary, #1D1D1F) !important;
+                    border: 1px solid var(--color-border-subtle, #D2D2D7) !important;
+                    border-radius: 9999px !important;
+                    height: 48px !important;
+                    padding: 0 24px !important;
+                    font-family: var(--font-body) !important;
+                    font-size: 15.5px !important;
+                    font-weight: 500 !important;
+                    cursor: pointer !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 10px !important;
+                    text-decoration: none !important;
+                    box-sizing: border-box !important;
+                    width: 100% !important;
+                    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease !important;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+                }
+
+                button.apple-btn-google:hover:not(:disabled),
+                .apple-btn-google:hover:not(:disabled) {
+                    background-color: var(--color-bg-elevated, #F5F5F7) !important;
+                    border-color: #BCBCC0 !important;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+                }
+
+                button.apple-btn-google:active:not(:disabled),
+                .apple-btn-google:active:not(:disabled) {
+                    background-color: #EBEBEF !important;
+                    transform: scale(0.99) !important;
+                }
+
+                button.apple-btn-google:disabled,
+                .apple-btn-google:disabled {
+                    opacity: 0.65 !important;
+                    cursor: not-allowed !important;
+                }
+
+                /* Modal styles */
+                .apple-modal-overlay {
+                    position: fixed;
+                    inset: 0;
+                    background-color: rgba(0, 0, 0, 0.45);
+                    backdrop-filter: blur(5px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    padding: 20px;
+                }
+
+                .apple-modal-window {
+                    background: #FFFFFF;
+                    border: 1px solid var(--color-border-subtle, #D2D2D7);
+                    border-radius: 16px;
+                    width: 100%;
+                    max-width: 440px;
+                    padding: 28px 24px 24px;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
                 }
 
                 .apple-card-footer {

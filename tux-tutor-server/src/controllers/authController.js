@@ -1,21 +1,34 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const passport = require('../config/passport');
 const { generateAndStoreOtp, removeOtpRecord, verifyAndConsumeOtp, COOLDOWN_SECONDS } = require('../services/otpService');
 const { sendOtpEmail, sendPasswordResetEmail } = require('../services/emailService');
 const prisma = require('../../db');
+const { recordLoginAttempt, recordSignupSuccess, logger } = require('../utils/logger');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * POST /api/auth/login
- * Password-based sign in. If password matches, issues JWT token and redirects to home.
+ * POST /api/auth/login and POST /auth/login
+ * Password-based sign in.
+ * Supports "Remember Me":
+ *  - rememberMe === true  => JWT expires in 30 days
+ *  - rememberMe === false => JWT expires in 15 minutes
+ * Logs all failed attempts to DB (LoginLog) and Winston auth.log. Never logs password.
  */
 async function login(req, res) {
-  try {
-    const { email, password } = req.body;
+  const clientIp = (req.headers['x-forwarded-for']?.split(',')[0] || req.ip || req.socket?.remoteAddress || '127.0.0.1').trim();
+  const { email, password, rememberMe } = req.body;
 
+  try {
     if (!email || !EMAIL_REGEX.test(email.trim())) {
+      await recordLoginAttempt({
+        email: email || 'invalid',
+        ipAddress: clientIp,
+        success: false,
+        reason: 'Invalid email format',
+      });
       return res.status(400).json({
         success: false,
         error: 'Please enter a valid email address.',
@@ -23,6 +36,12 @@ async function login(req, res) {
     }
 
     if (!password) {
+      await recordLoginAttempt({
+        email: email.trim().toLowerCase(),
+        ipAddress: clientIp,
+        success: false,
+        reason: 'Password missing',
+      });
       return res.status(400).json({
         success: false,
         error: 'Please enter your password.',
@@ -37,21 +56,73 @@ async function login(req, res) {
     });
 
     if (!user) {
+      await recordLoginAttempt({
+        email: normalizedEmail,
+        ipAddress: clientIp,
+        success: false,
+        reason: 'User account not found',
+      });
       return res.status(401).json({
         success: false,
-        error: 'No account found with this email. Please enlist to register your operative account.',
+        error: 'No account found with this email. Please sign up to get started.',
       });
     }
 
-    // Verify password using bcrypt
+    // Verify password using bcrypt (guard against null password if OAuth-only user)
+    if (!user.password) {
+      const isGoogle = Boolean(user.googleId);
+      const isGithub = Boolean(user.githubId);
+
+      let providerName = 'Google';
+      if (isGithub && !isGoogle) {
+        providerName = 'GitHub';
+      } else if (isGoogle && isGithub) {
+        providerName = 'Google or GitHub';
+      } else if (!isGoogle && !isGithub) {
+        providerName = null;
+      }
+
+      await recordLoginAttempt({
+        email: normalizedEmail,
+        ipAddress: clientIp,
+        success: false,
+        reason: providerName ? `Account registered via ${providerName} (password not set)` : 'Password not set',
+      });
+
+      return res.status(401).json({
+        success: false,
+        provider: isGoogle ? 'google' : isGithub ? 'github' : 'oauth',
+        error: providerName
+          ? `This account was created with ${providerName}. Please click "Continue with ${providerName}" to log in.`
+          : 'No password has been set for this account. Please use "Forgot password?" to set a password.',
+      });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
+      await recordLoginAttempt({
+        email: normalizedEmail,
+        ipAddress: clientIp,
+        success: false,
+        reason: 'Incorrect password',
+      });
       return res.status(401).json({
         success: false,
         error: 'Incorrect password. Please check your credentials and try again.',
       });
     }
+
+    // Login successful — record log
+    await recordLoginAttempt({
+      email: normalizedEmail,
+      ipAddress: clientIp,
+      success: true,
+    });
+
+    // Determine JWT Expiry based on Remember Me
+    const isRemembered = rememberMe === true || rememberMe === 'true';
+    const expiresIn = isRemembered ? '30d' : '15m';
 
     // Issue JWT
     const secret = process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026';
@@ -62,13 +133,14 @@ async function login(req, res) {
         username: user.username,
       },
       secret,
-      { expiresIn: '7d' }
+      { expiresIn }
     );
 
     return res.status(200).json({
       success: true,
       message: 'Signed in successfully.',
       token,
+      expiresIn,
       user: {
         id: user.id,
         username: user.username,
@@ -80,7 +152,7 @@ async function login(req, res) {
       },
     });
   } catch (err) {
-    console.error('[login Error]:', err.message);
+    logger.error('Unexpected error during login process', { error: err.message, email });
     return res.status(500).json({
       success: false,
       error: 'An unexpected error occurred during login. Please try again.',
@@ -90,7 +162,7 @@ async function login(req, res) {
 
 /**
  * POST /api/auth/send-otp
- * Validates email, enforces cooldown, generates hashed OTP, and dispatches via Resend.
+ * Validates email, enforces cooldown, generates hashed OTP, and dispatches via Nodemailer.
  */
 async function sendOtp(req, res) {
   let createdOtpId = null;
@@ -125,17 +197,17 @@ async function sendOtp(req, res) {
     const { otp, expiresAt, otpId } = await generateAndStoreOtp(normalizedEmail);
     createdOtpId = otpId;
 
-    // 2. Dispatch via Resend transactional email
+    // 2. Dispatch via transactional email
     try {
       await sendOtpEmail({ to: normalizedEmail, otp });
     } catch (emailError) {
       // If delivery fails, remove the OTP record so the user is NOT stuck with a 60s cooldown lock!
       await removeOtpRecord(createdOtpId);
 
-      console.error('[sendOtp] Resend dispatch failure:', emailError.message);
+      console.error('[sendOtp] Email dispatch failure:', emailError.message);
       return res.status(emailError.statusCode || 502).json({
         success: false,
-        error: emailError.message || 'Failed to send verification email. Please check your Resend configuration.',
+        error: emailError.message || 'Failed to send verification email. Please check your email configuration.',
       });
     }
 
@@ -188,6 +260,15 @@ async function verifyOtp(req, res) {
       otp: otp.trim(),
       password,
     });
+
+    if (isNewUser) {
+      const clientIp = (req.headers['x-forwarded-for']?.split(',')[0] || req.ip || req.socket?.remoteAddress || '127.0.0.1').trim();
+      recordSignupSuccess({
+        email: user.email,
+        username: user.username,
+        ipAddress: clientIp,
+      });
+    }
 
     // Generate JWT
     const secret = process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026';
@@ -502,11 +583,10 @@ async function resetPassword(req, res) {
       });
     }
 
-    const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
-    if (!PASSWORD_REGEX.test(newPassword) || /\s/.test(newPassword)) {
+    if (newPassword.length < 8 || /\s/.test(newPassword)) {
       return res.status(400).json({
         success: false,
-        error: 'Password must be at least 8 characters long and contain uppercase, lowercase, numbers, and symbols without spaces.',
+        error: 'Password must be at least 8 characters long without spaces.',
       });
     }
 
@@ -524,13 +604,15 @@ async function resetPassword(req, res) {
       });
     }
 
-    // Check if new password is same as current password using bcrypt
-    const isSamePassword = await bcrypt.compare(newPassword, record.user.password);
-    if (isSamePassword) {
-      return res.status(400).json({
-        success: false,
-        error: 'Your new password cannot be the same as your current password.',
-      });
+    // Check if new password is same as current password using bcrypt (if password was already set)
+    if (record.user.password) {
+      const isSamePassword = await bcrypt.compare(newPassword, record.user.password);
+      if (isSamePassword) {
+        return res.status(400).json({
+          success: false,
+          error: 'Your new password cannot be the same as your current password.',
+        });
+      }
     }
 
     // Hash new password
@@ -560,6 +642,177 @@ async function resetPassword(req, res) {
   }
 }
 
+/**
+ * Helper to find or create a user via Google OAuth
+ */
+async function findOrCreateGoogleUser({ googleId, email, name }) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // 1. Check if user already exists by googleId or email
+  let user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        ...(googleId ? [{ googleId: String(googleId) }] : []),
+        { email: normalizedEmail },
+      ],
+    },
+  });
+
+  if (user) {
+    // If user registered with email or another provider, link googleId to avoid duplicate accounts
+    if (googleId && !user.googleId) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { googleId: String(googleId) },
+      });
+    }
+    return { user, isNew: false };
+  }
+
+  // 2. Create new user account automatically
+  const rawUsername = (name || normalizedEmail.split('@')[0] || `google_${googleId || Date.now()}`)
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9_]/g, '_');
+  let username = rawUsername;
+  let suffix = 1;
+  while (await prisma.user.findUnique({ where: { username } })) {
+    username = `${rawUsername}_${suffix}`;
+    suffix += 1;
+  }
+
+  user = await prisma.user.create({
+    data: {
+      username,
+      email: normalizedEmail,
+      googleId: googleId ? String(googleId) : null,
+      password: null,
+      xp: 0,
+      level: 1,
+      streak: 0,
+    },
+  });
+
+  recordSignupSuccess({
+    email: user.email,
+    username: user.username,
+    ipAddress: 'google-oauth',
+  });
+
+  return { user, isNew: true };
+}
+
+/**
+ * POST /api/auth/google
+ * Direct / token-based Google Authentication (One-Tap, Token or Dev Mock)
+ */
+async function handleGoogleAuth(req, res) {
+  try {
+    const { email, name, googleId, credential } = req.body;
+
+    let targetEmail = email;
+    let targetName = name;
+    let targetGoogleId = googleId;
+
+    if (credential && typeof credential === 'string') {
+      try {
+        const decoded = jwt.decode(credential);
+        if (decoded && decoded.email) {
+          targetEmail = decoded.email;
+          targetName = decoded.name || decoded.given_name;
+          targetGoogleId = decoded.sub;
+        }
+      } catch (e) {
+        console.warn('[Google Auth] Failed to decode Google credential JWT:', e.message);
+      }
+    }
+
+    if (!targetEmail || typeof targetEmail !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'A valid email from Google is required.',
+      });
+    }
+
+    const { user, isNew } = await findOrCreateGoogleUser({
+      googleId: targetGoogleId,
+      email: targetEmail,
+      name: targetName,
+    });
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, username: user.username },
+      process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026',
+      { expiresIn: '7d' }
+    );
+
+    return res.status(200).json({
+      success: true,
+      token,
+      isNew,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        level: user.level,
+        xp: user.xp,
+        streak: user.streak,
+      },
+      message: isNew
+        ? 'Account successfully created with Google!'
+        : 'Successfully signed in with Google!',
+    });
+  } catch (err) {
+    console.error('[handleGoogleAuth Error]:', err.message);
+    return res.status(500).json({
+      success: false,
+      error: 'Google authentication failed. Please try again.',
+    });
+  }
+}
+
+/**
+ * GET /api/auth/google
+ * Redirects to Google OAuth consent screen (or dev notice if credentials are dummy)
+ */
+function initiateGoogleOAuth(req, res, next) {
+  const googleClientId = process.env.GOOGLE_CLIENT_ID;
+  const clientBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+  if (!googleClientId || googleClientId === 'dummy_google_client_id') {
+    return res.redirect(`${clientBaseUrl}/?auth_error=${encodeURIComponent('Google OAuth is not configured on this server.')}`);
+  }
+
+  return passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    prompt: 'select_account',
+    session: false,
+  })(req, res, next);
+}
+
+/**
+ * GET /api/auth/google/callback
+ * Handles Google OAuth redirect callback
+ */
+function handleGoogleCallback(req, res, next) {
+  const clientBaseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+  passport.authenticate('google', { session: false }, (err, result, info) => {
+    if (err || !result) {
+      const msg = encodeURIComponent(err?.message || info?.message || 'Google authentication was cancelled.');
+      return res.redirect(`${clientBaseUrl}/?auth_error=${msg}`);
+    }
+
+    const { user, isNew } = result;
+    const token = jwt.sign(
+      { id: user.id, email: user.email, username: user.username },
+      process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026',
+      { expiresIn: '7d' }
+    );
+
+    return res.redirect(`${clientBaseUrl}/?auth_token=${token}&is_new=${isNew}`);
+  })(req, res, next);
+}
+
 module.exports = {
   login,
   sendOtp,
@@ -569,4 +822,7 @@ module.exports = {
   forgotPassword,
   verifyResetToken,
   resetPassword,
+  handleGoogleAuth,
+  initiateGoogleOAuth,
+  handleGoogleCallback,
 };

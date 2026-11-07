@@ -5,13 +5,15 @@ import styles from './AppShell.module.css';
  * AppShell — 3-column layout: sidebar | main content | right rail.
  * The sidebar is fixed; main and rail scroll independently.
  *
- * @param {React.ReactNode} children  — center column content
- * @param {React.ReactNode} [rail]    — optional right-rail content
+ * @param {React.ReactNode} children    — center column content
+ * @param {React.ReactNode} [rail]      — optional right-rail content
+ * @param {object}          [currentUser] — authenticated user object
+ * @param {Function}        [onSignOut]   — sign-out handler
  */
-export default function AppShell({ children, rail }) {
+export default function AppShell({ children, rail, currentUser, onSignOut }) {
   return (
     <div className={styles.shell}>
-      <Sidebar />
+      <Sidebar currentUser={currentUser} onSignOut={onSignOut} />
 
       <div className={styles.body}>
         {/* ── Center / Main ────────────────────────────────────────── */}

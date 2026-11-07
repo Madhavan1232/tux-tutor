@@ -2,7 +2,7 @@
 
 **Theme:** Off-White Light Mode with Crimson (`#DC2626`) as the Only Accent  
 **Aesthetic:** Apple Store Precision, Generous Spacing, and Mixed-Weight Typographic Hierarchy  
-**Single Source of Truth:** `src/styles/tokens.css` (CSS) and `src/theme/colors.js` (JavaScript)
+**Single Source of Truth:** `src/styles/tokens.css` (CSS custom properties)
 
 ---
 

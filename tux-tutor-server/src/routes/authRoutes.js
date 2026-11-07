@@ -9,6 +9,9 @@ const {
   forgotPassword,
   verifyResetToken,
   resetPassword,
+  handleGoogleAuth,
+  initiateGoogleOAuth,
+  handleGoogleCallback,
 } = require('../controllers/authController');
 const { requireAuth } = require('../middleware/authMiddleware');
 const { otpSendLimiter, emailCheckLimiter } = require('../middleware/rateLimiter');
@@ -23,6 +26,11 @@ router.post('/verify-otp', verifyOtp);
 
 // Password authentication
 router.post('/login', login);
+
+// Google OAuth endpoints
+router.get('/google', initiateGoogleOAuth);
+router.get('/google/callback', handleGoogleCallback);
+router.post('/google', handleGoogleAuth);
 
 // Password Reset Flow
 router.post('/forgot-password', forgotPassword);
