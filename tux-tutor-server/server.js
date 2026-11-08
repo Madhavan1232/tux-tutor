@@ -6,6 +6,7 @@ const passport = require('./src/config/passport');
 const prisma = require('./db');
 const authRoutes = require('./src/routes/authRoutes');
 const dashboardRouter = require('./routes/dashboard/dashboardRouter');
+const missionRouter = require('./routes/mission/missionRouter');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,6 +15,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
+
+// Cross-Origin Isolation & Security Headers (Required by CheerpX SharedArrayBuffer)
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+});
 
 // Basic health check
 app.get('/api/health', async (req, res) => {
@@ -39,6 +48,9 @@ app.use('/api/auth', authRoutes);
 
 // Dashboard Routes
 app.use('/api/dashboard', dashboardRouter);
+
+// Mission Workspace Routes
+app.use('/api/missions', missionRouter);
 
 // Global Error Handler
 app.use((err, req, res, _next) => {

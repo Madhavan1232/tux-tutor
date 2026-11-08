@@ -1,0 +1,181 @@
+.hintsTab {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+  color: var(--color-text-primary);
+}
+
+.header {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-dark-burgundy);
+}
+
+.mascotArea {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.thinkingTux {
+  flex-shrink: 0;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.hintsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.hintCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-dark-burgundy);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-xs);
+  padding: var(--space-4);
+}
+
+.hintCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.hintNum {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-widest);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-semibold);
+}
+
+.revealedTag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-primary);
+  background-color: var(--color-deep-red);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-dark-burgundy);
+}
+
+.hintContent {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+  background-color: var(--color-background);
+  padding: var(--space-3);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-dark-burgundy);
+  white-space: pre-wrap;
+}
+
+.unlockCard {
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-primary);
+  border-radius: var(--radius-xs);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.unlockHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.helpIcon {
+  color: var(--color-secondary-red);
+}
+
+.unlockTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.penaltyNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+  background-color: var(--color-deep-red);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-dark-burgundy);
+}
+
+.penaltyNotice strong {
+  color: var(--color-text-primary);
+}
+
+.penaltyIcon {
+  color: var(--color-secondary-red);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.revealBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border: 1px solid var(--color-secondary-red);
+  border-radius: var(--radius-xs);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-apple);
+}
+
+.revealBtn:hover:not(:disabled) {
+  background-color: var(--color-secondary-red);
+}
+
+.revealBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.allRevealedNotice {
+  padding: var(--space-4);
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-dark-burgundy);
+  border-radius: var(--radius-xs);
+}

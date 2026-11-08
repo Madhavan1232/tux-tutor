@@ -1,0 +1,22 @@
+-- Add mission workspace fields to Mission
+ALTER TABLE "Mission"
+  ADD COLUMN IF NOT EXISTS "instructions" TEXT,
+  ADD COLUMN IF NOT EXISTS "goal" TEXT,
+  ADD COLUMN IF NOT EXISTS "steps" JSONB,
+  ADD COLUMN IF NOT EXISTS "seed_files" JSONB,
+  ADD COLUMN IF NOT EXISTS "setup_script" TEXT,
+  ADD COLUMN IF NOT EXISTS "validate_script" TEXT,
+  ADD COLUMN IF NOT EXISTS "fast_forward_script" TEXT,
+  ADD COLUMN IF NOT EXISTS "hints" JSONB,
+  ADD COLUMN IF NOT EXISTS "allow_upload" BOOLEAN NOT NULL DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS "upload_config" JSONB,
+  ADD COLUMN IF NOT EXISTS "min_seconds" INTEGER NOT NULL DEFAULT 3,
+  ADD COLUMN IF NOT EXISTS "requires_state_from" INTEGER;
+
+-- Add mission progress fields to UserMission
+ALTER TABLE "UserMission"
+  ADD COLUMN IF NOT EXISTS "status" TEXT NOT NULL DEFAULT 'completed',
+  ADD COLUMN IF NOT EXISTS "started_at" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "steps_completed" JSONB,
+  ADD COLUMN IF NOT EXISTS "hints_used" INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS "xp_awarded" INTEGER NOT NULL DEFAULT 0;
