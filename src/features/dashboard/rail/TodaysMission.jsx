@@ -1,3 +1,5 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/ui/Button';
 import styles from './TodaysMission.module.css';
 
@@ -7,6 +9,7 @@ import styles from './TodaysMission.module.css';
  * @param {{ id: number, title: string, worldName: string, xpReward: number }|null} mission
  */
 export default function TodaysMission({ mission }) {
+  const navigate = useNavigate();
   if (!mission) return null;
 
   const { title, worldName, xpReward } = mission;
@@ -23,7 +26,11 @@ export default function TodaysMission({ mission }) {
         <span className={styles.xp} aria-label={`${xpReward} XP reward`}>
           +{xpReward} XP
         </span>
-        <Button variant="primary" aria-label={`Start mission: ${title}`}>
+        <Button
+          variant="primary"
+          aria-label={`Start mission: ${title}`}
+          onClick={() => navigate(`/missions/${mission.id}`)}
+        >
           Start mission
         </Button>
       </div>

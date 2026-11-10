@@ -8,6 +8,7 @@ import WeeklyLeaderboard from './rail/WeeklyLeaderboard';
 import NextWorldProgress from './rail/NextWorldProgress';
 import Tux from '../../components/ui/Tux';
 import { useDashboardData } from './useDashboardData';
+import { RefreshCw } from 'lucide-react';
 import styles from './DashboardPage.module.css';
 
 /**
@@ -17,7 +18,7 @@ import styles from './DashboardPage.module.css';
  *  Sidebar (via AppShell) | Learning path | Stats rail
  */
 export default function DashboardPage() {
-  const { data, loading } = useDashboardData();
+  const { data, loading, error, refetch } = useDashboardData();
 
   /* ── Loading State ──────────────────────────────────────────────────── */
   if (loading) {
@@ -26,6 +27,27 @@ export default function DashboardPage() {
         <div className={styles.loadingState} role="status" aria-live="polite">
           <Tux mood="think" size={80} />
           <p className={styles.loadingText}>Loading your learning path…</p>
+        </div>
+      </AppShell>
+    );
+  }
+
+  /* ── Error State ────────────────────────────────────────────────────── */
+  if (error || !data) {
+    return (
+      <AppShell>
+        <div className={styles.errorState} role="alert">
+          <Tux mood="annoyed" size={80} />
+          <h2 className={styles.errorTitle}>Failed to Load Learning Path</h2>
+          <p className={styles.errorMessage}>{error || 'The server could not be reached.'}</p>
+          <button
+            type="button"
+            className={styles.retryButton}
+            onClick={refetch}
+          >
+            <RefreshCw size={14} />
+            <span>Retry Connection</span>
+          </button>
         </div>
       </AppShell>
     );

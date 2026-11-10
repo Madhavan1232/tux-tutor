@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Crown, Star, Check, Lock, Sparkles } from 'lucide-react';
 import Tux from '../../../components/ui/Tux';
@@ -16,6 +17,7 @@ import styles from './BossNode.module.css';
  * @param {object} [style] — coordinate position styling
  */
 export default function BossNode({ boss, worldName, worldIndex, theme: _theme, style }) {
+  const navigate = useNavigate();
   const isLocked = boss?.status === 'locked';
   const isCompleted = boss?.status === 'completed';
   const isCurrent = boss?.status === 'current';
@@ -63,6 +65,7 @@ export default function BossNode({ boss, worldName, worldIndex, theme: _theme, s
           aria-label={`Boss Challenge: World ${worldIndex} — ${worldName}. Status: ${boss?.status ?? 'locked'}, ${xpReward} XP reward`}
           disabled={isLocked}
           aria-disabled={isLocked}
+          onClick={() => boss?.id && navigate(`/missions/${boss.id}`)}
           tabIndex={isLocked ? -1 : 0}
           title={isLocked ? `Complete all World ${worldIndex} missions to unlock Boss` : `Boss Challenge: ${worldName} (+${xpReward} XP)`}
         >

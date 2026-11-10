@@ -48,32 +48,51 @@ enum MissionType {
 }
 
 model Mission {
-  id             Int           @id @default(autoincrement())
-  title          String
-  description    String
-  world          String?
-  worldId        Int?          @map("world_id")
-  orderIndex     Int           @default(0) @map("order_index")
-  type           MissionType   @default(mission)
-  xpReward       Int           @default(50) @map("xp_reward")
-  command        String
-  expectedOutput String
-  createdAt      DateTime      @default(now())
+  id                Int           @id @default(autoincrement())
+  title             String
+  description       String
+  world             String?
+  worldId           Int?          @map("world_id")
+  orderIndex        Int           @default(0) @map("order_index")
+  type              MissionType   @default(mission)
+  xpReward          Int           @default(50) @map("xp_reward")
+  command           String
+  expectedOutput    String
+  createdAt         DateTime      @default(now())
 
-  worldRef       World?        @relation(fields: [worldId], references: [id], onDelete: Cascade)
-  userMissions   UserMission[]
+  instructions      String?       @db.Text
+  goal              String?       @db.Text
+  steps             Json?
+  seedFiles         Json?         @map("seed_files")
+  setupScript       String?       @map("setup_script") @db.Text
+  validateScript    String?       @map("validate_script") @db.Text
+  fastForwardScript String?       @map("fast_forward_script") @db.Text
+  hints             Json?
+  allowUpload       Boolean       @default(false) @map("allow_upload")
+  uploadConfig      Json?         @map("upload_config")
+  minSeconds        Int           @default(3) @map("min_seconds")
+  requiresStateFrom Int?          @map("requires_state_from")
+
+  worldRef          World?        @relation(fields: [worldId], references: [id], onDelete: Cascade)
+  userMissions      UserMission[]
 
   @@map("Mission")
 }
 
 model UserMission {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @map("user_id")
-  missionId   Int      @map("mission_id")
-  completedAt DateTime @default(now()) @map("completed_at")
+  id             Int       @id @default(autoincrement())
+  userId         Int       @map("user_id")
+  missionId      Int       @map("mission_id")
+  completedAt    DateTime  @default(now()) @map("completed_at")
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  mission     Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  status         String    @default("completed")
+  startedAt      DateTime? @map("started_at")
+  stepsCompleted Json?     @map("steps_completed")
+  hintsUsed      Int       @default(0) @map("hints_used")
+  xpAwarded      Int       @default(0) @map("xp_awarded")
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission        Mission   @relation(fields: [missionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, missionId])
   @@map("UserMission")

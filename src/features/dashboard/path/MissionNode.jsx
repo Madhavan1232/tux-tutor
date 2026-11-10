@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Check, Lock, Play, Zap } from 'lucide-react';
 import styles from './MissionNode.module.css';
@@ -17,6 +18,7 @@ import styles from './MissionNode.module.css';
  * @param {object} [style] — Coordinate position styling
  */
 export default function MissionNode({ mission, theme, index = 0, style }) {
+  const navigate = useNavigate();
   const { title, status, xpReward = 50 } = mission;
   const isCurrent = status === 'current';
   const isCompleted = status === 'completed';
@@ -70,6 +72,7 @@ export default function MissionNode({ mission, theme, index = 0, style }) {
           }}
           disabled={isLocked}
           aria-disabled={isLocked}
+          onClick={() => navigate(`/missions/${mission.id}`)}
           aria-label={`${title} — ${status}, ${xpReward} XP reward`}
           tabIndex={isLocked ? -1 : 0}
           title={isLocked ? 'Complete previous missions to unlock' : `${title} (+${xpReward} XP)`}

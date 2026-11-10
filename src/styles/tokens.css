@@ -1,13 +1,13 @@
 /* ==========================================================================
-   TUX TUTOR — CSS DESIGN TOKENS (Apple-Style White & Crimson Design Language)
+   TUX TUTOR — CSS DESIGN TOKENS
    Single source of truth. Never hardcode hex values in components.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import './fonts.css';
 
 :root {
   /* ══════════════════════════════════════════════════════════════════════
-     COLOR TOKENS (Apple White & Red Design System)
+     COLOR TOKENS (Base Theme)
   ══════════════════════════════════════════════════════════════════════ */
 
   /* === BACKGROUNDS === */
@@ -19,9 +19,9 @@
   --color-border-subtle:  #D2D2D7;   /* Dividers, input borders */
   --color-border-focus:   #DC2626;   /* Focused input borders */
 
-  /* === TEXT === */
-  --color-text-primary:   #1D1D1F;   /* Headings, main content (Apple near-black) */
-  --color-text-secondary: #6E6E73;   /* Labels, subtext, placeholders (Apple warm muted gray) */
+  /* === TEXT (Dark High-Contrast for Light Base) === */
+  --color-text-primary:   #1D1D1F;   /* Headings, main content (near-black) */
+  --color-text-secondary: #6E6E73;   /* Labels, subtext, placeholders (warm muted gray) */
   --color-text-muted:     #86868B;   /* Disabled, hints */
 
   /* === ACCENT (Crimson) === */
@@ -35,13 +35,13 @@
   --color-error:          #DC2626;   /* Validation errors */
   --color-warning:        #B45309;   /* Warnings */
 
-  /* ── Legacy Aliases ── */
-  --color-background:     var(--color-bg-base);
-  --color-surface:        var(--color-bg-surface);
-  --color-primary:        var(--color-accent);
-  --color-secondary-red:  var(--color-accent-hover);
-  --color-dark-burgundy:  var(--color-accent);
-  --color-deep-red:       var(--color-accent-hover);
+  /* ── Core Brand Aliases ── */
+  --color-background:     #000000;
+  --color-primary:        #770600;
+  --color-surface:        #161414;
+  --color-secondary-red:  #7A0401;
+  --color-dark-burgundy:  #4D0B08;
+  --color-deep-red:       #170001;
   --bg-app:               var(--color-bg-base);
   --bg-surface:           var(--color-bg-surface);
   --bg-panel-burgundy:    var(--color-accent-muted);
@@ -50,7 +50,7 @@
   --text-secondary:       var(--color-text-secondary);
 
   /* ══════════════════════════════════════════════════════════════════════
-     TYPOGRAPHY TOKENS (Apple-Inspired Typography System)
+     TYPOGRAPHY TOKENS
   ══════════════════════════════════════════════════════════════════════ */
 
   /* === FONT FAMILIES === */
@@ -66,7 +66,7 @@
   --text-xs:    0.75rem;     /* 12px — captions, legal */
   --text-sm:    0.8125rem;   /* 13px — footnotes, metadata */
   --text-base:  1rem;        /* 16px — body */
-  --text-md:    1.0625rem;   /* 17px — Apple's default UI size */
+  --text-md:    1.0625rem;   /* 17px */
   --text-lg:    1.25rem;     /* 20px — subheadings */
   --text-xl:    1.5rem;      /* 24px — section titles */
   --text-2xl:   2rem;        /* 32px — page headings */
@@ -104,7 +104,7 @@
   --tracking-widest:   0.08em;
 
   /* ══════════════════════════════════════════════════════════════════════
-     SPACING & LAYOUT SYSTEM (Multiples of 4 / 8px)
+     SPACING & LAYOUT SYSTEM
   ══════════════════════════════════════════════════════════════════════ */
   --space-1:   4px;
   --space-2:   8px;
@@ -119,14 +119,14 @@
   --space-20:  80px;
   --space-24:  96px;
 
-  /* === BORDER RADIUS (Apple Shapes) === */
+  /* === BORDER RADIUS === */
   --radius-xs:   4px;
-  --radius-sm:   8px;    /* Tags, badges */
-  --radius-md:   12px;   /* Inputs, small cards */
-  --radius-lg:   16px;   /* Cards, modals */
-  --radius-xl:   20px;   /* Large panels */
-  --radius-2xl:  28px;   /* Feature cards */
-  --radius-pill: 9999px; /* Buttons, chips */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  28px;
+  --radius-pill: 9999px;
 
   /* ══════════════════════════════════════════════════════════════════════
      MOTION & TRANSITIONS
@@ -154,4 +154,30 @@
   --sidebar-width:   240px;
   --rail-width:      320px;
   --path-max-width:  620px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MISSION WORKSPACE THEME (Section 2 Dark Luxury Editorial Identity)
+   Applied strictly to the terminal workspace without leaking white text to light pages.
+   ══════════════════════════════════════════════════════════════════════ */
+[data-theme="workspace"] {
+  --color-background:     #000000;
+  --color-primary:        #770600;
+  --color-surface:        #161414;
+  --color-secondary-red:  #7A0401;
+  --color-dark-burgundy:  #4D0B08;
+  --color-deep-red:       #170001;
+  --color-text-primary:   #FFFFFF;
+  --color-text-secondary: #BCB3B3;
+  --color-text-muted:     #888888;
+  --color-border-subtle:  #261919;
+  --color-border-focus:   #770600;
+  --bg-app:               var(--color-background);
+  --bg-surface:           var(--color-surface);
+  --bg-panel-burgundy:    var(--color-deep-red);
+  --bg-hover-burgundy:    var(--color-dark-burgundy);
+  --text-primary:         var(--color-text-primary);
+  --text-secondary:       var(--color-text-secondary);
+  background-color:       var(--color-background);
+  color:                  var(--color-text-primary);
 }

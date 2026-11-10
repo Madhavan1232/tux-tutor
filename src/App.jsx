@@ -4,6 +4,7 @@ import AuthPage from './components/auth/AuthPage';
 import ResetPasswordPage from './components/auth/ResetPasswordPage';
 import DashboardPage from './features/dashboard/DashboardPage';
 import SidebarPreviewPage from './features/sidebar-preview/SidebarPreviewPage';
+import MissionPage from './features/mission/MissionPage';
 import AppShell from './components/layout/AppShell';
 import { AuthContext } from './context/AuthContext';
 import tuxLogo from './assets/logo.png';
@@ -171,7 +172,8 @@ export default function App() {
           <Route path="/sidebar" element={<SidebarPreviewPage currentUser={currentUser} />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/terminal" element={<Placeholder title="Terminal" />} />
+          <Route path="/missions/:id" element={<MissionPage />} />
+          <Route path="/terminal" element={<Navigate to="/missions/1" replace />} />
           <Route path="/badges" element={<Placeholder title="Badges" />} />
           <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
           <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
@@ -183,7 +185,7 @@ export default function App() {
                   <span className={styles.placeholderOverline}>Active Session</span>
                   <h1 className={styles.placeholderTitle}>{currentUser.email || currentUser.username}</h1>
                   <p className={styles.placeholderText}>
-                    Authenticated operative ID: <code>UID: 1000</code>
+                    Authenticated operative ID: <code>UID: {currentUser.id}</code>
                   </p>
                   <button
                     type="button"

@@ -1,0 +1,67 @@
+.terminalPanel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: var(--color-background);
+  overflow: hidden;
+}
+
+.terminalContainer {
+  flex: 1;
+  width: 100%;
+  background-color: var(--color-background);
+  padding: var(--space-3) var(--space-4);
+  overflow: hidden;
+  outline: none;
+}
+
+.terminalContainer:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+.terminalFooter {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-dark-burgundy);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.kbNotice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-secondary);
+  opacity: 0.75;
+}
+
+.kbNotice kbd {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-dark-burgundy);
+  border-radius: var(--radius-xs);
+  padding: 1px 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-primary);
+}
+
+.creditLine {
+  color: var(--color-text-secondary);
+}
+
+.creditLink {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--duration-fast) var(--ease-apple);
+}
+
+.creditLink:hover {
+  color: var(--color-secondary-red);
+}
