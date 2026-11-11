@@ -1,7 +1,8 @@
+// Icons: lucide-react only — do not mix libraries
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Flame, Award, ArrowRight, Home } from 'lucide-react';
-import Tux from '../../components/ui/Tux';
+import TuxModel from '../../components/TuxModel';
 import styles from './MissionComplete.module.css';
 
 /**
@@ -28,7 +29,7 @@ export default function MissionComplete({ result, mission, onNextMission }) {
       <div className={styles.modalCard}>
         {/* Mascot */}
         <div className={styles.mascotArea}>
-          <Tux mood={isAlreadyCompleted ? 'happy' : 'cheer'} size={130} />
+          <TuxModel size={130} animate interactive />
         </div>
 
         {/* Celebration Header */}

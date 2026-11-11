@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { getStoredToken } from '../../utils/auth';
 
 /**
  * useMission — Coordinates mission data fetching, start recording,
@@ -22,7 +23,7 @@ export function useMission(missionId) {
   }, [missionId]);
 
   const getHeaders = useCallback(() => {
-    const token = localStorage.getItem('token');
+    const token = getStoredToken();
     return {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -61,7 +62,7 @@ export function useMission(missionId) {
       }
 
       // Record start on server if user is authenticated
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (token) {
         fetch(`/api/missions/${missionId}/start`, {
           method: 'POST',
@@ -116,7 +117,7 @@ export function useMission(missionId) {
   const saveProgress = useCallback(
     async (steps) => {
       setCompletedSteps(steps);
-      const token = localStorage.getItem('token');
+      const token = getStoredToken();
       if (!token) return;
 
       try {

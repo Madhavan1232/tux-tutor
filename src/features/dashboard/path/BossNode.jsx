@@ -1,8 +1,9 @@
+// Icons: lucide-react only — do not mix libraries
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Crown, Star, Check, Lock, Sparkles } from 'lucide-react';
-import Tux from '../../../components/ui/Tux';
+import { ArrowDown, Crown, Star, Check, Lock, Sparkles } from 'lucide-react';
+import TuxModel from '../../../components/TuxModel';
 import styles from './BossNode.module.css';
 
 /**
@@ -23,8 +24,6 @@ export default function BossNode({ boss, worldName, worldIndex, theme: _theme, s
   const isCurrent = boss?.status === 'current';
   const xpReward = boss?.xpReward ?? 150;
 
-  const tuxMood = isCompleted ? 'cheer' : isCurrent ? 'think' : 'sleep';
-
   return (
     <motion.div
       className={styles.wrapper}
@@ -38,14 +37,15 @@ export default function BossNode({ boss, worldName, worldIndex, theme: _theme, s
       {/* ── 1. Floating Boss Battle Indicator ──────────────────────── */}
       {isCurrent && (
         <div className={styles.bossBadge} aria-hidden="true">
-          <Sparkles size={13} className={styles.sparkleIcon} />
-          <span>FINAL BOSS ↓</span>
+          <Sparkles size={13} strokeWidth={2} className={styles.sparkleIcon} />
+          <span>FINAL BOSS</span>
+          <ArrowDown size={11} strokeWidth={2.2} aria-hidden="true" />
         </div>
       )}
 
       {/* ── 2. Boss Tux Mascot Banner ──────────────────────────────── */}
       <div className={styles.tuxSlot} aria-hidden="true">
-        <Tux mood={tuxMood} size={48} />
+        <TuxModel size={48} animate={!isLocked} interactive={!isLocked} locked={isLocked} />
       </div>
 
       {/* ── 3. The Grand Golden Boss Node ──────────────────────────── */}

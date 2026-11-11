@@ -151,7 +151,7 @@
   --border-focus:        2px solid var(--color-accent);
 
   /* === LAYOUT SIZES === */
-  --sidebar-width:   240px;
+  --sidebar-width:   260px;
   --rail-width:      320px;
   --path-max-width:  620px;
 }

@@ -1,3 +1,4 @@
+// Icons: lucide-react only — do not mix libraries
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Monitor, BookOpen, AlertCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
@@ -5,6 +6,7 @@ import PreviewPanel from './preview/PreviewPanel';
 import TerminalPanel from './terminal/TerminalPanel';
 import BootScreen from './BootScreen';
 import MissionComplete from './MissionComplete';
+import TuxCelebration from '../../components/TuxCelebration';
 import { useLinuxVM } from './vm/useLinuxVM';
 import {
   initializeMissionEnvironment,
@@ -45,6 +47,11 @@ export default function MissionWorkspace({
   const [checkFeedback, setCheckFeedback] = useState(null);
   const [completionError, setCompletionError] = useState(null);
   const [isRetryingCompletion, setIsRetryingCompletion] = useState(false);
+  const [dismissedCelebrationFor, setDismissedCelebrationFor] = useState(null);
+
+  const missionStatus = completionResult ? 'completed' : 'active';
+  const showCelebration =
+    missionStatus === 'completed' && dismissedCelebrationFor !== completionResult;
 
   // Check window width for responsive layout
   useEffect(() => {
@@ -65,9 +72,16 @@ export default function MissionWorkspace({
 
   // Initialize mission environment when VM and mission are both ready
   const isEnvInitializedRef = useRef(false);
+  const initializedMissionIdRef = useRef(null);
   useEffect(() => {
-    if (vm.ready && mission && !isEnvInitializedRef.current) {
+    if (!vm.ready) {
+      isEnvInitializedRef.current = false;
+      return;
+    }
+
+    if (mission && (!isEnvInitializedRef.current || initializedMissionIdRef.current !== mission.id)) {
       isEnvInitializedRef.current = true;
+      initializedMissionIdRef.current = mission.id;
       initializeMissionEnvironment(vm, mission)
         .then(() => {
           // Run initial step checks
@@ -79,6 +93,7 @@ export default function MissionWorkspace({
           }
         })
         .catch((err) => {
+          isEnvInitializedRef.current = false;
           console.error('[MissionWorkspace] Environment setup error:', err);
         });
     }
@@ -349,8 +364,15 @@ export default function MissionWorkspace({
         </div>
       </main>
 
-      {/* ── Mission Complete Screen ───────────────────────────────────── */}
-      {completionResult && (
+      {/* ── Mission Complete Celebration Portal & Summary Modal ───────── */}
+      {showCelebration && (
+        <TuxCelebration
+          xpAwarded={completionResult.xpAwarded ?? mission?.xpReward ?? 0}
+          onComplete={() => setDismissedCelebrationFor(completionResult)}
+        />
+      )}
+
+      {completionResult && !showCelebration && (
         <MissionComplete
           result={completionResult}
           mission={mission}

@@ -1,3 +1,4 @@
+// Icons: lucide-react only — do not mix libraries
 import AppShell from '../../components/layout/AppShell';
 import LearningPath from './path/LearningPath';
 import StreakStat from './rail/StreakStat';
@@ -6,9 +7,12 @@ import MissionStats from './rail/MissionStats';
 import TodaysMission from './rail/TodaysMission';
 import WeeklyLeaderboard from './rail/WeeklyLeaderboard';
 import NextWorldProgress from './rail/NextWorldProgress';
-import Tux from '../../components/ui/Tux';
+import TuxModel from '../../components/TuxModel';
 import { useDashboardData } from './useDashboardData';
-import { RefreshCw } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { clearStoredAuth } from '../../utils/auth';
+import { formatDisplayName } from '../../utils/user';
+import { RefreshCw, LogIn } from 'lucide-react';
 import styles from './DashboardPage.module.css';
 
 /**
@@ -18,6 +22,7 @@ import styles from './DashboardPage.module.css';
  *  Sidebar (via AppShell) | Learning path | Stats rail
  */
 export default function DashboardPage() {
+  const { currentUser } = useAuth();
   const { data, loading, error, refetch } = useDashboardData();
 
   /* ── Loading State ──────────────────────────────────────────────────── */
@@ -25,7 +30,7 @@ export default function DashboardPage() {
     return (
       <AppShell>
         <div className={styles.loadingState} role="status" aria-live="polite">
-          <Tux mood="think" size={80} />
+          <TuxModel size={80} animate />
           <p className={styles.loadingText}>Loading your learning path…</p>
         </div>
       </AppShell>
@@ -34,20 +39,41 @@ export default function DashboardPage() {
 
   /* ── Error State ────────────────────────────────────────────────────── */
   if (error || !data) {
+    const isAuthError =
+      error?.toLowerCase().includes('token') ||
+      error?.toLowerCase().includes('unauthorized') ||
+      error?.toLowerCase().includes('401') ||
+      error?.toLowerCase().includes('sign in');
+
     return (
       <AppShell>
         <div className={styles.errorState} role="alert">
-          <Tux mood="annoyed" size={80} />
+          <TuxModel size={80} animate={false} />
           <h2 className={styles.errorTitle}>Failed to Load Learning Path</h2>
           <p className={styles.errorMessage}>{error || 'The server could not be reached.'}</p>
-          <button
-            type="button"
-            className={styles.retryButton}
-            onClick={refetch}
-          >
-            <RefreshCw size={14} />
-            <span>Retry Connection</span>
-          </button>
+          <div className={styles.errorActions}>
+            <button
+              type="button"
+              className={styles.retryButton}
+              onClick={refetch}
+            >
+              <RefreshCw size={14} />
+              <span>Retry Connection</span>
+            </button>
+            {isAuthError && (
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => {
+                  clearStoredAuth();
+                  window.location.href = '/';
+                }}
+              >
+                <LogIn size={14} />
+                <span>Sign In Again</span>
+              </button>
+            )}
+          </div>
         </div>
       </AppShell>
     );
@@ -79,7 +105,7 @@ export default function DashboardPage() {
 
       <LearningPath
         worlds={data?.worlds ?? []}
-        userName={data?.user?.name ?? ''}
+        userName={formatDisplayName(data?.user ?? currentUser)}
       />
     </AppShell>
   );

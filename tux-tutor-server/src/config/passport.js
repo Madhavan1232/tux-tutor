@@ -40,6 +40,8 @@ passport.use(
         }
         const normalizedEmail = email.trim().toLowerCase();
 
+        const githubDisplayName = (profile.displayName || profile._json?.name || '').trim() || null;
+
         // 1. Check if user exists by githubId or email
         let user = await prisma.user.findFirst({
           where: {
@@ -51,11 +53,18 @@ passport.use(
         });
 
         if (user) {
-          // Link githubId if user previously registered with email/password
+          // Link githubId and/or backfill missing displayName on existing accounts
+          const updateData = {};
           if (!user.githubId) {
+            updateData.githubId = githubId;
+          }
+          if (!user.displayName && githubDisplayName) {
+            updateData.displayName = githubDisplayName;
+          }
+          if (Object.keys(updateData).length > 0) {
             user = await prisma.user.update({
               where: { id: user.id },
-              data: { githubId },
+              data: updateData,
             });
           }
           return done(null, { user, isNew: false });
@@ -74,6 +83,7 @@ passport.use(
           data: {
             username,
             email: normalizedEmail,
+            displayName: githubDisplayName,
             githubId,
             password: null,
             xp: 0,
@@ -120,6 +130,12 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'dummy_google_client_id') {
           }
           const normalizedEmail = email.trim().toLowerCase();
 
+          const googleDisplayName = (
+            profile.displayName ||
+            [profile.name?.givenName, profile.name?.familyName].filter(Boolean).join(' ') ||
+            ''
+          ).trim() || null;
+
           // 1. Check if user exists by googleId or email
           let user = await prisma.user.findFirst({
             where: {
@@ -131,11 +147,18 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'dummy_google_client_id') {
           });
 
           if (user) {
-            // Link googleId if not linked yet
+            // Link googleId and/or backfill missing displayName on existing accounts
+            const updateData = {};
             if (!user.googleId) {
+              updateData.googleId = googleId;
+            }
+            if (!user.displayName && googleDisplayName) {
+              updateData.displayName = googleDisplayName;
+            }
+            if (Object.keys(updateData).length > 0) {
               user = await prisma.user.update({
                 where: { id: user.id },
-                data: { googleId },
+                data: updateData,
               });
             }
             return done(null, { user, isNew: false });
@@ -156,6 +179,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'dummy_google_client_id') {
             data: {
               username,
               email: normalizedEmail,
+              displayName: googleDisplayName,
               googleId,
               password: null,
               xp: 0,

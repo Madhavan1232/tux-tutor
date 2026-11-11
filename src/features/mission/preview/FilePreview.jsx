@@ -1,3 +1,4 @@
+// Icons: lucide-react only — do not mix libraries
 import React from 'react';
 import { FileText, X } from 'lucide-react';
 import styles from './FilePreview.module.css';

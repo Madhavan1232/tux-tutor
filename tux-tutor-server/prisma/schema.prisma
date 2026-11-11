@@ -12,6 +12,7 @@ model User {
   id                  Int                  @id @default(autoincrement())
   username            String               @unique
   email               String               @unique
+  displayName         String?              @map("display_name")
   password            String?
   githubId            String?              @unique @map("github_id")
   googleId            String?              @unique @map("google_id")

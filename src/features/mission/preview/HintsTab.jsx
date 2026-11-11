@@ -1,6 +1,7 @@
+// Icons: lucide-react only — do not mix libraries
 import React from 'react';
 import { HelpCircle, AlertCircle, Eye, Check } from 'lucide-react';
-import Tux from '../../../components/ui/Tux';
+import TuxModel from '../../../components/TuxModel';
 import styles from './HintsTab.module.css';
 
 /**
@@ -28,7 +29,7 @@ export default function HintsTab({
     <div className={styles.hintsTab} role="region" aria-label="Mission hints">
       <div className={styles.header}>
         <div className={styles.mascotArea}>
-          <Tux mood="think" size={56} className={styles.thinkingTux} />
+          <TuxModel size={56} animate className={styles.thinkingTux} />
           <div className={styles.headerText}>
             <h3 className={styles.title}>Guidance & Hints</h3>
             <p className={styles.subtitle}>

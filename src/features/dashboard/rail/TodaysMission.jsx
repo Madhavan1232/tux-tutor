@@ -1,5 +1,7 @@
+// Icons: lucide-react only — do not mix libraries
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Target, Play } from 'lucide-react';
 import Button from '../../../components/ui/Button';
 import styles from './TodaysMission.module.css';
 
@@ -19,7 +21,10 @@ export default function TodaysMission({ mission }) {
       className={styles.block}
       aria-label="Today's mission"
     >
-      <div className={styles.overline}>Today's Mission</div>
+      <div className={styles.overline}>
+        <Target size={13} strokeWidth={2} aria-hidden="true" />
+        <span>Today's Mission</span>
+      </div>
       <h3 className={styles.title}>{title}</h3>
       <p className={styles.world}>{worldName}</p>
       <div className={styles.footer}>
@@ -31,7 +36,8 @@ export default function TodaysMission({ mission }) {
           aria-label={`Start mission: ${title}`}
           onClick={() => navigate(`/missions/${mission.id}`)}
         >
-          Start mission
+          <Play size={14} strokeWidth={2} aria-hidden="true" />
+          <span>Start mission</span>
         </Button>
       </div>
     </section>

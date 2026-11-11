@@ -1,7 +1,8 @@
+// Icons: lucide-react only — do not mix libraries
 import React from 'react';
 import { Zap, ShieldAlert, Award } from 'lucide-react';
 import StepChecklist from './StepChecklist';
-import Tux from '../../../components/ui/Tux';
+import TuxModel from '../../../components/TuxModel';
 import styles from './TaskTab.module.css';
 
 /**
@@ -80,9 +81,10 @@ export default function TaskTab({ mission, completedSteps = [] }) {
       {/* ── Footer Progress Stat & Mascot ─────────────────────────────── */}
       <div className={styles.footerRow}>
         <div className={styles.mascotWrap}>
-          <Tux
-            mood={isAllDone ? 'cheer' : 'idle'}
+          <TuxModel
             size={48}
+            animate
+            interactive={isAllDone}
             className={styles.tuxMascot}
           />
           <div className={styles.progressText}>

@@ -1,3 +1,5 @@
+// Icons: lucide-react only — do not mix libraries
+import { Zap } from 'lucide-react';
 import ProgressBar from '../../../components/ui/ProgressBar';
 import { levelLabel } from '../../../utils/levels';
 import styles from './LevelXp.module.css';
@@ -13,7 +15,10 @@ export default function LevelXp({ user }) {
 
   return (
     <section className={styles.section} aria-label="Level and experience">
-      <div className={styles.overline}>Level &amp; XP</div>
+      <div className={styles.overline}>
+        <Zap size={13} strokeWidth={2} aria-hidden="true" />
+        <span>Level &amp; XP</span>
+      </div>
       <div className={styles.levelRow}>
         <span className={styles.levelNum} aria-label={label}>{label}</span>
       </div>

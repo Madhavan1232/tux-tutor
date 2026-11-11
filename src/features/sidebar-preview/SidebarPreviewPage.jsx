@@ -1,14 +1,12 @@
+// Icons: lucide-react only — do not mix libraries
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, Users, Bell, ShieldCheck, Layers, ExternalLink } from 'lucide-react';
-import RebuiltSidebar from '../../components/layout/RebuiltSidebar';
+import { CheckCircle2, Circle, Users, Bell, ShieldCheck, Layers, ExternalLink } from 'lucide-react';
+import Sidebar from '../../components/layout/Sidebar';
 import styles from './SidebarPreviewPage.module.css';
 
 export default function SidebarPreviewPage({ currentUser: propUser }) {
   const navigate = useNavigate();
-
-  // Active selection inside the sidebar
-  const [activeKey, setActiveKey] = useState('home');
 
   // Controls for interactive testing
   const [userMode, setUserMode] = useState('reference'); // 'reference' (Jane Doe) | 'active' (Logged-in user)
@@ -33,16 +31,6 @@ export default function SidebarPreviewPage({ currentUser: propUser }) {
       ? { name: 'Jane Doe', email: 'jane@acme.com', level: 1 }
       : propUser || { name: 'Active Operative', email: 'tux@academy.dev', level: 3 };
 
-  const handleSidebarSelect = (key) => {
-    setActiveKey(key);
-    if (key === 'home') {
-      showToast('Navigated to Home (Dashboard)');
-    } else if (key.startsWith('doc-')) {
-      const docName = key.replace('doc-', '');
-      showToast(`Selected document: "${docName.charAt(0).toUpperCase() + docName.slice(1)}"`);
-    }
-  };
-
   const handleSignOut = () => {
     showToast('Sign out action triggered successfully');
   };
@@ -59,20 +47,10 @@ export default function SidebarPreviewPage({ currentUser: propUser }) {
     <div className={styles.previewContainer}>
       {/* ── Fixed Sidebar on the Left (Exact match to reference) ──── */}
       <div className={styles.sidebarWrapper}>
-        <RebuiltSidebar
+        <Sidebar
           currentUser={activeUser}
           onSignOut={handleSignOut}
-          activeKey={activeKey}
-          onSelect={handleSidebarSelect}
           notificationCount={notificationCount}
-          onInviteClick={() => setIsInviteOpen(true)}
-          onSearchClick={() => setIsSearchOpen(true)}
-          onNotificationsClick={() => {
-            showToast(`You have ${notificationCount} unread notifications`);
-          }}
-          onSettingsClick={() => {
-            showToast('Opened Settings');
-          }}
         />
       </div>
 
@@ -111,8 +89,9 @@ export default function SidebarPreviewPage({ currentUser: propUser }) {
               <code>{activeKey}</code>
             </div>
           </div>
-          <span style={{ fontSize: '12.5px', color: '#15803D', fontWeight: 600 }}>
-            ● Interactive &amp; Reactive
+          <span style={{ fontSize: '12.5px', color: '#15803D', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Circle size={8} strokeWidth={2} fill="currentColor" aria-hidden="true" />
+            <span>Interactive &amp; Reactive</span>
           </span>
         </div>
 

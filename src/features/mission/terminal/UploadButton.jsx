@@ -1,3 +1,4 @@
+// Icons: lucide-react only — do not mix libraries
 import React, { useRef, useState } from 'react';
 import { Upload, CheckCircle2, AlertCircle } from 'lucide-react';
 import styles from './UploadButton.module.css';

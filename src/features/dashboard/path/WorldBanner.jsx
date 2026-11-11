@@ -1,7 +1,8 @@
+// Icons: lucide-react only — do not mix libraries
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Lock, ChevronDown, Award, Sparkles } from 'lucide-react';
-import Tux from '../../../components/ui/Tux';
+import { Lock, ChevronDown, BadgeCheck, Route } from 'lucide-react';
+import TuxModel from '../../../components/TuxModel';
 import MissionNode from './MissionNode';
 import BossNode from './BossNode';
 import SnakePathSvg from './SnakePathSvg';
@@ -45,8 +46,6 @@ export default function WorldBanner({ world, isExpanded, onToggle }) {
 
   const completedCount = missions.filter((m) => m.status === 'completed').length;
   const totalMissionsCount = missions.length + (boss ? 1 : 0);
-
-  const tuxMood = isWorldCompleted ? 'cheer' : isLockedWorld ? 'sleep' : 'idle';
 
   // ── Calculate Snake Path Coordinates ──────────────────────────────
   // Desktop S-curve horizontal offsets (in px relative to center 200 in 400px viewBox)
@@ -119,7 +118,7 @@ export default function WorldBanner({ world, isExpanded, onToggle }) {
 
             {isWorldCompleted && (
               <span className={styles.clearedBadge}>
-                <Award size={12} />
+                <BadgeCheck size={13} strokeWidth={2} aria-hidden="true" />
                 CLEARED
               </span>
             )}
@@ -127,7 +126,7 @@ export default function WorldBanner({ world, isExpanded, onToggle }) {
 
           {/* World Name Title */}
           <h3 className={styles.worldName}>
-            {isLockedWorld && <Lock size={18} className={styles.lockIconInline} />}
+            {isLockedWorld && <Lock size={18} strokeWidth={2} className={styles.lockIconInline} aria-hidden="true" />}
             {name}
           </h3>
 
@@ -154,7 +153,12 @@ export default function WorldBanner({ world, isExpanded, onToggle }) {
         {/* Header Right: Tux Mascot + Chevron */}
         <div className={styles.headerRight}>
           <div className={styles.tuxContainer} aria-hidden="true">
-            <Tux mood={tuxMood} size={50} />
+            <TuxModel
+              size={64}
+              animate={!isLockedWorld}
+              interactive={!isLockedWorld}
+              locked={isLockedWorld}
+            />
           </div>
 
           <motion.div
@@ -187,7 +191,7 @@ export default function WorldBanner({ world, isExpanded, onToggle }) {
             {/* Path Subheader Bar */}
             <div className={styles.pathHeaderBar}>
               <span className={styles.pathSubheader}>
-                <Sparkles size={12} style={{ color: theme.accent }} />
+                <Route size={13} strokeWidth={2} className={styles.pathIcon} aria-hidden="true" />
                 {isMobile ? 'Single-Column Mobile Path' : 'Winding Mission Path'}
               </span>
               <span className={styles.pathHint}>

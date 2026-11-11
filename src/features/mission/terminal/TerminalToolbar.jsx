@@ -1,3 +1,4 @@
+// Icons: lucide-react only — do not mix libraries
 import React, { useState } from 'react';
 import { RotateCcw, CheckSquare, Terminal as TermIcon, AlertTriangle } from 'lucide-react';
 import UploadButton from './UploadButton';

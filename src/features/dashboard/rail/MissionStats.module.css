@@ -26,6 +26,17 @@
   min-width: 0;
 }
 
+.valueRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.doneIcon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
 .value {
   font-size: 1.4rem;
   font-weight: var(--weight-bold);

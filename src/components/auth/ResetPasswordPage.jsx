@@ -1,7 +1,19 @@
+// Icons: lucide-react only — do not mix libraries
 import { useEffect, useState } from "react"
 import { motion } from "motion/react"
-import { Eye, EyeOff, Info, CheckCircle2, AlertTriangle, SquareChevronRight } from "lucide-react"
-import tuxLogo from "../../assets/logo.png"
+import {
+    AlertTriangle,
+    ArrowLeft,
+    ArrowRight,
+    Check,
+    CheckCircle2,
+    Circle,
+    Eye,
+    EyeOff,
+    Info,
+    SquareChevronRight,
+} from "lucide-react"
+import TuxModel from "../TuxModel"
 
 const API_BASE_URL = "http://localhost:5000/api/auth"
 
@@ -156,11 +168,7 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
             <header className="apple-global-header">
                 <div className="apple-header-inner">
                     <div className="apple-logo-lockup">
-                        <img
-                            src={tuxLogo}
-                            alt="TUX TUTOR Mascot"
-                            className="apple-logo-img"
-                        />
+                        <TuxModel size={36} animate={false} interactive />
                         <span className="apple-brand-name">TUX TUTOR</span>
                     </div>
                     <div className="apple-header-badge">
@@ -187,7 +195,7 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
 
                         <ul className="apple-features-list" style={{ listStyle: "none", padding: 0, margin: 0 }}>
                             <li style={{ display: "flex", gap: "12px", alignItems: "flex-start", marginBottom: "14px" }}>
-                                <SquareChevronRight size={20} color="#DC2626" strokeWidth={1.5} style={{ flexShrink: 0, marginTop: "2px" }} />
+                                <SquareChevronRight size={20} strokeWidth={2} className="apple-feature-icon" aria-hidden="true" />
                                 <div>
                                     <strong style={{ fontSize: "15px", color: "#1D1D1F", display: "block" }}>
                                         Interactive terminal sandbox
@@ -198,7 +206,7 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                                 </div>
                             </li>
                             <li style={{ display: "flex", gap: "12px", alignItems: "flex-start", marginBottom: "14px" }}>
-                                <SquareChevronRight size={20} color="#DC2626" strokeWidth={1.5} style={{ flexShrink: 0, marginTop: "2px" }} />
+                                <SquareChevronRight size={20} strokeWidth={2} className="apple-feature-icon" aria-hidden="true" />
                                 <div>
                                     <strong style={{ fontSize: "15px", color: "#1D1D1F", display: "block" }}>
                                         Encrypted Credentials
@@ -221,7 +229,7 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                             </div>
                             <pre className="apple-terminal-code">
                                 <span className="t-prompt">$</span> tux auth verify-token --scope=password-reset{'\n'}
-                                <span className="t-success">✓ Cryptographic token validated (TLS 1.3 / bcrypt)</span>{'\n'}
+                                <span className="t-success">[OK] Cryptographic token validated (TLS 1.3 / bcrypt)</span>{'\n'}
                                 <span className="t-prompt">$</span> <span className="t-cursor" />
                             </pre>
                         </div>
@@ -273,7 +281,8 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                                     onClick={() => onNavigateToLogin && onNavigateToLogin()}
                                     className="apple-btn-primary full-width"
                                 >
-                                    Back to Sign In &rarr;
+                                    <span>Back to Sign In</span>
+                                    <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
                                 </button>
                             </motion.div>
                         ) : (
@@ -302,7 +311,7 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
 
                                 {isSuccess && (
                                     <div className="apple-alert-box apple-alert-success" role="status">
-                                        <CheckCircle2 size={16} strokeWidth={2} className="apple-alert-icon" style={{ color: "#16A34A", flexShrink: 0 }} />
+                                        <CheckCircle2 size={16} strokeWidth={2} className="apple-alert-icon" aria-hidden="true" />
                                         <span>Password updated successfully! Redirecting to sign in...</span>
                                     </div>
                                 )}
@@ -335,9 +344,9 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                                                 aria-label={showNewPassword ? "Hide password" : "Show password"}
                                             >
                                                 {showNewPassword ? (
-                                                    <EyeOff size={18} strokeWidth={1.75} />
+                                                    <EyeOff size={18} strokeWidth={2} />
                                                 ) : (
-                                                    <Eye size={18} strokeWidth={1.75} />
+                                                    <Eye size={18} strokeWidth={2} />
                                                 )}
                                             </button>
                                         </div>
@@ -372,7 +381,11 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                                                         className={`apple-rule-row ${rule.met ? "is-met" : "is-unmet"}`}
                                                     >
                                                         <span className="apple-rule-icon">
-                                                            {rule.met ? "✓" : "○"}
+                                                            {rule.met ? (
+                                                                <Check size={12} strokeWidth={2.5} aria-hidden="true" />
+                                                            ) : (
+                                                                <Circle size={10} strokeWidth={2} aria-hidden="true" />
+                                                            )}
                                                         </span>
                                                         <span className="apple-caption">{rule.label}</span>
                                                     </div>
@@ -393,10 +406,20 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                                                     style={{
                                                         fontSize: "12px",
                                                         fontWeight: 600,
+                                                        display: "inline-flex",
+                                                        alignItems: "center",
+                                                        gap: "4px",
                                                         color: passwordsMatch ? "#15803D" : "#DC2626",
                                                     }}
                                                 >
-                                                    {passwordsMatch ? "✓ Passwords match" : "Does not match"}
+                                                    {passwordsMatch ? (
+                                                        <>
+                                                            <Check size={13} strokeWidth={2.5} aria-hidden="true" />
+                                                            <span>Passwords match</span>
+                                                        </>
+                                                    ) : (
+                                                        "Does not match"
+                                                    )}
                                                 </span>
                                             )}
                                         </div>
@@ -422,9 +445,9 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                                                 aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                                             >
                                                 {showConfirmPassword ? (
-                                                    <EyeOff size={18} strokeWidth={1.75} />
+                                                    <EyeOff size={18} strokeWidth={2} />
                                                 ) : (
-                                                    <Eye size={18} strokeWidth={1.75} />
+                                                    <Eye size={18} strokeWidth={2} />
                                                 )}
                                             </button>
                                         </div>
@@ -443,7 +466,10 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                                                 <span>Updating password...</span>
                                             </>
                                         ) : isSuccess ? (
-                                            <span>Password Updated ✓</span>
+                                            <>
+                                                <span>Password Updated</span>
+                                                <Check size={16} strokeWidth={2.2} aria-hidden="true" />
+                                            </>
                                         ) : (
                                             "Update password"
                                         )}
@@ -456,7 +482,8 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                                         onClick={() => onNavigateToLogin && onNavigateToLogin(targetEmail)}
                                         className="apple-link apple-caption"
                                     >
-                                        &larr; Back to sign in
+                                        <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
+                                        <span>Back to sign in</span>
                                     </button>
                                 </div>
                             </motion.div>
@@ -719,8 +746,16 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                     padding: 0;
                     margin: 0;
                     cursor: pointer;
-                    display: inline;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
                     transition: opacity 0.2s var(--ease-apple);
+                }
+
+                .apple-feature-icon {
+                    color: #DC2626;
+                    flex-shrink: 0;
+                    margin-top: 2px;
                 }
 
                 .apple-link:hover {
@@ -860,6 +895,9 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                 }
 
                 .apple-rule-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
                     font-size: 11px;
                     font-weight: 700;
                 }
@@ -904,9 +942,11 @@ export default function ResetPasswordPage({ token, onNavigateToLogin }) {
                     color: #15803D;
                 }
 
+                .apple-alert-success .apple-alert-icon {
+                    color: #16A34A;
+                }
+
                 .apple-alert-icon {
-                    width: 14px;
-                    height: 14px;
                     flex-shrink: 0;
                 }
 

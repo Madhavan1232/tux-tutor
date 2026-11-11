@@ -1,7 +1,19 @@
+// Icons: lucide-react only — do not mix libraries
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
-import { Eye, EyeOff, Info, SquareChevronRight } from "lucide-react"
-import tuxLogo from "../../assets/logo.png"
+import {
+    AlertCircle,
+    ArrowLeft,
+    ArrowRight,
+    Check,
+    Circle,
+    Eye,
+    EyeOff,
+    Info,
+    SquareChevronRight,
+} from "lucide-react"
+import TuxModel from "../TuxModel"
+import { setStoredToken } from "../../utils/auth"
 
 const API_BASE_URL = "http://localhost:5000/api/auth"
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -213,7 +225,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
 
             if (token) {
                 setIsSuccess(true)
-                localStorage.setItem("tux_token", token)
+                setStoredToken(token)
                 fetch(`${API_BASE_URL}/me`, {
                     headers: { Authorization: `Bearer ${token}` },
                 })
@@ -425,7 +437,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
             }
 
             if (data.token) {
-                localStorage.setItem("tux_token", data.token)
+                setStoredToken(data.token)
             }
 
             setIsSuccess(true)
@@ -480,7 +492,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
             if (res.status === 409 || data.code === "EMAIL_ALREADY_EXISTS") {
                 setEmailExistsState(null)
                 setMode("login")
-                setLoginNotice("An account with this email already exists. Sign in →")
+                setLoginNotice("An account with this email already exists. Please sign in.")
                 setPassword("")
                 setError("")
                 setShowPasswordField(true)
@@ -536,7 +548,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
 
             setIsSuccess(true)
             if (data.token) {
-                localStorage.setItem("tux_token", data.token)
+                setStoredToken(data.token)
             }
 
             setTimeout(() => {
@@ -583,11 +595,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
             <header className="apple-global-header">
                 <div className="apple-header-inner">
                     <div className="apple-logo-lockup">
-                        <img
-                            src={tuxLogo}
-                            alt="TUX TUTOR Mascot"
-                            className="apple-logo-img"
-                        />
+                        <TuxModel size={36} animate={false} interactive />
                         <span className="apple-brand-name">TUX TUTOR</span>
                     </div>
                     <div className="apple-header-badge">
@@ -619,11 +627,11 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
 
                         <ul className="apple-features-list" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                             <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '14px' }}>
-                                <SquareChevronRight 
-                                    size={20} 
-                                    color="#DC2626" 
-                                    strokeWidth={1.5}
-                                    style={{ flexShrink: 0, marginTop: '2px' }} 
+                                <SquareChevronRight
+                                    size={20}
+                                    strokeWidth={2}
+                                    className="apple-feature-icon"
+                                    aria-hidden="true"
                                 />
                                 <div>
                                     <strong style={{ fontSize: '15px', color: '#1D1D1F', display: 'block' }}>
@@ -636,11 +644,11 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                             </li>
 
                             <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '14px' }}>
-                                <SquareChevronRight 
-                                    size={20} 
-                                    color="#DC2626" 
-                                    strokeWidth={1.5}
-                                    style={{ flexShrink: 0, marginTop: '2px' }} 
+                                <SquareChevronRight
+                                    size={20}
+                                    strokeWidth={2}
+                                    className="apple-feature-icon"
+                                    aria-hidden="true"
                                 />
                                 <div>
                                     <strong style={{ fontSize: '15px', color: '#1D1D1F', display: 'block' }}>
@@ -653,11 +661,11 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                             </li>
 
                             <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '14px' }}>
-                                <SquareChevronRight 
-                                    size={20} 
-                                    color="#DC2626" 
-                                    strokeWidth={1.5}
-                                    style={{ flexShrink: 0, marginTop: '2px' }} 
+                                <SquareChevronRight
+                                    size={20}
+                                    strokeWidth={2}
+                                    className="apple-feature-icon"
+                                    aria-hidden="true"
                                 />
                                 <div>
                                     <strong style={{ fontSize: '15px', color: '#1D1D1F', display: 'block' }}>
@@ -682,7 +690,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                             </div>
                             <pre className="apple-terminal-code">
                                 <span className="t-prompt">$</span> tux lab start linux-fundamentals{'\n'}
-                                <span className="t-success">✓ Sandbox ready (kernel 6.8.0-tux-x86_64)</span>{'\n'}
+                                <span className="t-success">[OK] Sandbox ready (kernel 6.8.0-tux-x86_64)</span>{'\n'}
                                 <span className="t-prompt">$</span> uname -srmo{'\n'}
                                 <span className="t-out">Linux 6.8.0-tux-x86_64 GNU/Linux</span>{'\n'}
                                 <span className="t-prompt">$</span> <span className="t-cursor" />
@@ -722,7 +730,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
 
                                     {resetNotice && (
                                         <div className="apple-alert-box apple-alert-success" role="status">
-                                            <Info size={16} strokeWidth={2} className="apple-alert-icon" style={{ color: "#16A34A", flexShrink: 0 }} />
+                                            <Info size={16} strokeWidth={2} className="apple-alert-icon" aria-hidden="true" />
                                             <span>{resetNotice}</span>
                                         </div>
                                     )}
@@ -730,9 +738,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     {error && (
                                         <div className="apple-alert-box apple-alert-error" role="alert" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
                                             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', width: '100%' }}>
-                                                <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor" style={{ marginTop: '2px', flexShrink: 0 }}>
-                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                                </svg>
+                                                <AlertCircle size={16} strokeWidth={2} className="apple-alert-icon" style={{ marginTop: '2px' }} aria-hidden="true" />
                                                 <span style={{ flex: 1 }}>{error}</span>
                                             </div>
                                             {error.includes("Google") && (
@@ -754,7 +760,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                         gap: '4px'
                                                     }}
                                                 >
-                                                    Sign in with Google now →
+                                                    <span>Sign in with Google now</span>
+                                                    <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
                                                 </button>
                                             )}
                                         </div>
@@ -838,9 +845,9 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                                 aria-label={showPassword ? "Hide password" : "Show password"}
                                                             >
                                                                 {showPassword ? (
-                                                                    <EyeOff size={18} strokeWidth={1.75} />
+                                                                    <EyeOff size={18} strokeWidth={2} />
                                                                 ) : (
-                                                                    <Eye size={18} strokeWidth={1.75} />
+                                                                    <Eye size={18} strokeWidth={2} />
                                                                 )}
                                                             </button>
                                                         </div>
@@ -855,7 +862,10 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                             className="apple-btn-primary full-width"
                                         >
                                             {!showPasswordField ? (
-                                                "Continue →"
+                                                <>
+                                                    <span>Continue</span>
+                                                    <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
+                                                </>
                                             ) : loading ? (
                                                 <>
                                                     <CrimsonSpinner size={16} color="#FFFFFF" />
@@ -904,7 +914,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                             onClick={() => handleSwitchMode("signup")}
                                             className="apple-link apple-caption"
                                         >
-                                            Sign up for free →
+                                            <span>Sign up for free</span>
+                                            <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
                                         </button>
                                     </div>
                                 </motion.div>
@@ -930,9 +941,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     {error && (
                                         <div className="apple-alert-box apple-alert-error" role="alert" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
                                             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', width: '100%' }}>
-                                                <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor" style={{ marginTop: '2px', flexShrink: 0 }}>
-                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                                </svg>
+                                                <AlertCircle size={16} strokeWidth={2} className="apple-alert-icon" style={{ marginTop: '2px' }} aria-hidden="true" />
                                                 <span style={{ flex: 1 }}>{error}</span>
                                             </div>
                                             {error.includes("Google") && (
@@ -954,7 +963,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                         gap: '4px'
                                                     }}
                                                 >
-                                                    Sign in with Google now →
+                                                    <span>Sign in with Google now</span>
+                                                    <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
                                                 </button>
                                             )}
                                         </div>
@@ -992,7 +1002,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                 className="apple-btn-primary apple-caption"
                                                 style={{ padding: "6px 14px", height: "auto" }}
                                             >
-                                                Verify Now →
+                                                <span>Verify Now</span>
+                                                <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
                                             </button>
                                         </div>
                                     )}
@@ -1070,9 +1081,9 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                                 aria-label={showPassword ? "Hide password" : "Show password"}
                                                             >
                                                                 {showPassword ? (
-                                                                    <EyeOff size={18} strokeWidth={1.75} />
+                                                                    <EyeOff size={18} strokeWidth={2} />
                                                                 ) : (
-                                                                    <Eye size={18} strokeWidth={1.75} />
+                                                                    <Eye size={18} strokeWidth={2} />
                                                                 )}
                                                             </button>
                                                         </div>
@@ -1110,7 +1121,11 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                                         className={`apple-rule-row ${rule.met ? "is-met" : "is-unmet"}`}
                                                                     >
                                                                         <span className="apple-rule-icon">
-                                                                            {rule.met ? "✓" : "○"}
+                                                                            {rule.met ? (
+                                                                                <Check size={12} strokeWidth={2.5} aria-hidden="true" />
+                                                                            ) : (
+                                                                                <Circle size={10} strokeWidth={2} aria-hidden="true" />
+                                                                            )}
                                                                         </span>
                                                                         <span className="apple-caption">{rule.label}</span>
                                                                     </div>
@@ -1134,7 +1149,10 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                         <span>Checking email...</span>
                                                     </>
                                                 ) : (
-                                                    "Continue →"
+                                                    <>
+                                                        <span>Continue</span>
+                                                        <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
+                                                    </>
                                                 )
                                             ) : loading ? (
                                                 <>
@@ -1182,7 +1200,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                             onClick={() => handleSwitchMode("login")}
                                             className="apple-link apple-caption"
                                         >
-                                            Sign in →
+                                            <span>Sign in</span>
+                                            <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
                                         </button>
                                     </div>
                                 </motion.div>
@@ -1209,9 +1228,7 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                     {error && (
                                         <div className="apple-alert-box apple-alert-error" role="alert" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
                                             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', width: '100%' }}>
-                                                <svg className="apple-alert-icon" viewBox="0 0 20 20" fill="currentColor" style={{ marginTop: '2px', flexShrink: 0 }}>
-                                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                                </svg>
+                                                <AlertCircle size={16} strokeWidth={2} className="apple-alert-icon" style={{ marginTop: '2px' }} aria-hidden="true" />
                                                 <span style={{ flex: 1 }}>{error}</span>
                                             </div>
                                             {error.includes("Google") && (
@@ -1233,7 +1250,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                         gap: '4px'
                                                     }}
                                                 >
-                                                    Sign in with Google now →
+                                                    <span>Sign in with Google now</span>
+                                                    <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
                                                 </button>
                                             )}
                                         </div>
@@ -1267,7 +1285,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                     disabled={loading || isSuccess}
                                                     className="apple-link apple-caption"
                                                 >
-                                                    Resend verification code →
+                                                    <span>Resend verification code</span>
+                                                    <ArrowRight size={13} strokeWidth={2} aria-hidden="true" />
                                                 </button>
                                             )}
                                         </div>
@@ -1284,7 +1303,10 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                                     <span>Verifying...</span>
                                                 </>
                                             ) : isSuccess ? (
-                                                <span>Email verified ✓</span>
+                                                <>
+                                                    <span>Email verified</span>
+                                                    <Check size={16} strokeWidth={2.2} aria-hidden="true" />
+                                                </>
                                             ) : (
                                                 "Verify email"
                                             )}
@@ -1297,7 +1319,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                                             onClick={() => handleSwitchMode("login")}
                                             className="apple-link apple-caption"
                                         >
-                                            ← Back to sign in
+                                            <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
+                                            <span>Back to sign in</span>
                                         </button>
                                     </div>
                                 </motion.div>
@@ -1452,6 +1475,12 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     flex-direction: column;
                 }
 
+                .apple-feature-icon {
+                    color: #DC2626;
+                    flex-shrink: 0;
+                    margin-top: 2px;
+                }
+
                 /* Terminal Preview Card */
                 .apple-terminal-card {
                     background-color: #161617; /* High-contrast dark window inside light page */
@@ -1583,7 +1612,10 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     padding: 0 !important;
                     margin: 0 !important;
                     cursor: pointer !important;
-                    display: inline !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 4px !important;
+                    vertical-align: baseline !important;
                     font-weight: 500 !important;
                     transition: opacity 0.2s var(--ease-apple) !important;
                 }
@@ -1747,6 +1779,9 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 }
 
                 .apple-rule-icon {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
                     font-size: 11px;
                     font-weight: 700;
                 }
@@ -1970,10 +2005,12 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                 }
 
                 .apple-alert-icon {
-                    width: 14px;
-                    height: 14px;
                     flex-shrink: 0;
                     color: var(--color-accent);
+                }
+
+                .apple-alert-success .apple-alert-icon {
+                    color: #16A34A;
                 }
 
                 /* OTP Grid */

@@ -1,14 +1,19 @@
-import { useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import AuthPage from './components/auth/AuthPage';
-import ResetPasswordPage from './components/auth/ResetPasswordPage';
-import DashboardPage from './features/dashboard/DashboardPage';
-import SidebarPreviewPage from './features/sidebar-preview/SidebarPreviewPage';
-import MissionPage from './features/mission/MissionPage';
 import AppShell from './components/layout/AppShell';
 import { AuthContext } from './context/AuthContext';
-import tuxLogo from './assets/logo.png';
+import { getStoredToken, clearStoredAuth } from './utils/auth';
+import { formatDisplayName } from './utils/user';
+import TuxLoader from './components/TuxLoader';
 import styles from './App.module.css';
+
+const AuthPage = lazy(() => import('./components/auth/AuthPage'));
+const ResetPasswordPage = lazy(() => import('./components/auth/ResetPasswordPage'));
+const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage'));
+const SidebarPreviewPage = lazy(() => import('./features/sidebar-preview/SidebarPreviewPage'));
+const MissionPage = lazy(() => import('./features/mission/MissionPage'));
+
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
 
 function Placeholder({ title }) {
   return (
@@ -30,6 +35,7 @@ function Placeholder({ title }) {
  */
 export default function App() {
   const [isInitializing, setIsInitializing] = useState(true);
+  const [showLoader, setShowLoader] = useState(true);
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('tux_user');
@@ -68,6 +74,37 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Refresh user profile from /api/auth/me when a JWT exists so displayName stays synced
+  useEffect(() => {
+    const token = getStoredToken();
+    if (!token) return;
+
+    let cancelled = false;
+    fetch(`${API_BASE}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          clearStoredAuth();
+          if (!cancelled) setCurrentUser(null);
+          return null;
+        }
+        return res.ok ? res.json() : null;
+      })
+      .then((data) => {
+        if (!cancelled && data?.user) {
+          setCurrentUser(data.user);
+        }
+      })
+      .catch(() => {
+        // Ignore network errors during background profile sync
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useEffect(() => {
     try {
       if (currentUser) {
@@ -102,107 +139,78 @@ export default function App() {
     setResetToken('');
   };
 
-  if (isInitializing) {
-    return (
-      <div
-        className="tux-splash-screen"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'var(--color-bg-base)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-        }}
-      >
-        <img
-          src={tuxLogo}
-          alt="TUX TUTOR"
-          className="tux-logo-pulse"
-          style={{
-            width: '100px',
-            height: '100px',
-            objectFit: 'contain',
-            filter: 'drop-shadow(0 4px 16px rgba(220, 38, 38, 0.25))',
-          }}
-        />
-        <div
-          style={{
-            marginTop: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <span className="apple-eyebrow">
-            Tux Tutor — Initializing Sandbox
-          </span>
-        </div>
-      </div>
-    );
-  }
-
-  // Unauthenticated or Password Reset flow
+  let content;
   if (!currentUser) {
-    if (isResetRoute) {
-      return (
-        <ResetPasswordPage
-          token={resetToken}
-          onNavigateToLogin={handleNavigateToLoginFromReset}
-        />
-      );
-    }
-
-    return (
+    content = isResetRoute ? (
+      <ResetPasswordPage
+        token={resetToken}
+        onNavigateToLogin={handleNavigateToLoginFromReset}
+      />
+    ) : (
       <AuthPage
         onAuthSuccess={handleAuthSuccess}
         initialEmail={prefilledEmail}
         initialNotice={authNotice}
       />
     );
+  } else {
+    content = (
+      <AuthContext.Provider value={{ currentUser, onSignOut: handleSignOut }}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/sidebar" element={<SidebarPreviewPage currentUser={currentUser} />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/missions/:id" element={<MissionPage />} />
+            <Route path="/terminal" element={<Navigate to="/missions/1" replace />} />
+            <Route path="/badges" element={<Placeholder title="Badges" />} />
+            <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
+            <Route path="/ranking" element={<Placeholder title="Leaderboard" />} />
+            <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
+            <Route
+              path="/profile"
+              element={
+                <AppShell>
+                  <div className={styles.placeholder}>
+                    <span className={styles.placeholderOverline}>Active Session</span>
+                    <h1 className={styles.placeholderTitle}>
+                      {formatDisplayName(currentUser) || currentUser.email || currentUser.username}
+                    </h1>
+                    <p className={styles.placeholderText}>
+                      {currentUser.email ? `${currentUser.email} · ` : ''}
+                      Authenticated operative ID: <code>UID: {currentUser.id}</code>
+                    </p>
+                    <button
+                      type="button"
+                      className="apple-btn-secondary"
+                      onClick={handleSignOut}
+                      style={{ marginTop: '16px' }}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </AppShell>
+              }
+            />
+            <Route path="/settings" element={<Placeholder title="Settings" />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthContext.Provider>
+    );
   }
 
-  // Authenticated Learning Dashboard & Terminal
   return (
-    <AuthContext.Provider value={{ currentUser, onSignOut: handleSignOut }}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/sidebar" element={<SidebarPreviewPage currentUser={currentUser} />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/missions/:id" element={<MissionPage />} />
-          <Route path="/terminal" element={<Navigate to="/missions/1" replace />} />
-          <Route path="/badges" element={<Placeholder title="Badges" />} />
-          <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
-          <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
-          <Route
-            path="/profile"
-            element={
-              <AppShell>
-                <div className={styles.placeholder}>
-                  <span className={styles.placeholderOverline}>Active Session</span>
-                  <h1 className={styles.placeholderTitle}>{currentUser.email || currentUser.username}</h1>
-                  <p className={styles.placeholderText}>
-                    Authenticated operative ID: <code>UID: {currentUser.id}</code>
-                  </p>
-                  <button
-                    type="button"
-                    className="apple-btn-secondary"
-                    onClick={handleSignOut}
-                    style={{ marginTop: '16px' }}
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </AppShell>
-            }
-          />
-          <Route path="/settings" element={<Placeholder title="Settings" />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthContext.Provider>
+    <>
+      <Suspense fallback={showLoader ? null : <TuxLoader />}>
+        {content}
+      </Suspense>
+      {showLoader && (
+        <TuxLoader
+          isDone={!isInitializing}
+          onExited={() => setShowLoader(false)}
+        />
+      )}
+    </>
   );
 }

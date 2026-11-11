@@ -1,3 +1,4 @@
+// Icons: lucide-react only — do not mix libraries
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -38,10 +39,13 @@ export default function MissionNode({ mission, theme, index = 0, style }) {
         ease: [0.16, 1, 0.3, 1],
       }}
     >
-      {/* ── 1. Floating "START ↓" Badge for Current Node ─────────── */}
+      {/* ── 1. Floating "START" Badge for Current Node ─────────── */}
       {isCurrent && (
         <div className={styles.startBadge} aria-hidden="true">
-          <span className={styles.startBadgeText}>START ↓</span>
+          <span className={styles.startBadgeText}>
+            <Play size={10} strokeWidth={2.2} aria-hidden="true" />
+            <span>START</span>
+          </span>
         </div>
       )}
 
@@ -87,7 +91,7 @@ export default function MissionNode({ mission, theme, index = 0, style }) {
           {/* Current State: Play Icon */}
           {isCurrent && (
             <span className={styles.iconWrap}>
-              <Play size={20} fill="currentColor" strokeWidth={0} />
+              <Play size={20} fill="currentColor" strokeWidth={2} />
             </span>
           )}
 

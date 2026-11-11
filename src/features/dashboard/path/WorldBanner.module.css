@@ -160,7 +160,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
 }
 
 .chevronWrap {
@@ -217,6 +216,11 @@
   letter-spacing: 0.06em;
   color: #E2E8F0;
   text-transform: uppercase;
+}
+
+.pathIcon {
+  color: var(--world-accent);
+  flex-shrink: 0;
 }
 
 .pathHint {

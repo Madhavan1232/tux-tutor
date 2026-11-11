@@ -1,9 +1,10 @@
-import Tux from '../../../components/ui/Tux';
+// Icons: lucide-react only — do not mix libraries
+import { Flame } from 'lucide-react';
+import TuxModel from '../../../components/TuxModel';
 import styles from './StreakStat.module.css';
 
 /**
- * StreakStat — shows current streak with an animated Tux.
- * Tux cheers when the streak is active today, else idles.
+ * StreakStat — shows current streak with an animated 3D Tux.
  *
  * @param {{ current: number, best: number, activeToday: boolean }} streak
  */
@@ -12,7 +13,10 @@ export default function StreakStat({ streak }) {
 
   return (
     <section className={styles.section} aria-label="Daily streak">
-      <div className={styles.overline}>Streak</div>
+      <div className={styles.overline}>
+        <Flame size={13} strokeWidth={2} aria-hidden="true" />
+        <span>Streak</span>
+      </div>
       <div className={styles.row}>
         <div className={styles.numeral}>
           <span className={styles.count} aria-label={`${current} day streak`}>
@@ -21,7 +25,7 @@ export default function StreakStat({ streak }) {
           <span className={styles.unit}>days</span>
         </div>
         <div className={styles.tuxSlot} aria-hidden="true">
-          <Tux mood={activeToday ? 'cheer' : 'idle'} size={52} />
+          <TuxModel size={60} animate interactive={activeToday} />
         </div>
       </div>
       <p className={styles.best}>Best: {best} days</p>

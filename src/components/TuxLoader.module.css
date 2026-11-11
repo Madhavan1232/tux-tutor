@@ -1,0 +1,80 @@
+.loaderOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #0F0F0F;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 400ms ease;
+}
+
+.loaderExiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wordmark {
+  margin-top: 16px;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #E53E3E;
+  opacity: 0;
+  animation: wordmarkFadeIn 400ms ease 300ms forwards;
+}
+
+.progressTrack {
+  margin-top: 14px;
+  width: 160px;
+  height: 3px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background-color: #E53E3E;
+  animation: loaderProgress 1500ms ease-in-out forwards;
+}
+
+@keyframes wordmarkFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loaderProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loaderOverlay {
+    transition: opacity 150ms ease;
+  }
+  .wordmark {
+    animation: none;
+    opacity: 1;
+  }
+  .progressFill {
+    animation: none;
+    width: 100%;
+  }
+}
+

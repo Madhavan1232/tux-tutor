@@ -1,4 +1,5 @@
 const prisma = require('../../db');
+const { formatDisplayName } = require('../../src/utils/displayName');
 
 /**
  * dashboardService — all SQL queries for GET /api/dashboard.
@@ -55,6 +56,8 @@ async function getDashboardData(userId) {
     where: { id: userId },
     select: {
       username: true,
+      email: true,
+      displayName: true,
       level: true,
       xp: true,
       streakCurrent: true,
@@ -230,9 +233,14 @@ async function getDashboardData(userId) {
   // XP to next level (simple formula: 500 * level * 1.15)
   const xpToNext = Math.round(500 * user.level * Math.pow(1.15, user.level - 1));
 
+  const formattedName = formatDisplayName(user);
+
   return {
     user: {
-      name: user.username,
+      name: formattedName,
+      displayName: user.displayName?.trim() || formattedName,
+      username: user.username,
+      email: user.email,
       level: user.level,
       xp: user.xp,
       xpToNext,

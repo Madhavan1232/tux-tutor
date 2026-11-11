@@ -21,6 +21,7 @@
 .startBadgeText {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   background-color: #FFFFFF;
   color: #1D1D1F;
   font-family: var(--font-body);

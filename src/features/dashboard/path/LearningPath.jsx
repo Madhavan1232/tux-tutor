@@ -1,5 +1,6 @@
+// Icons: lucide-react only — do not mix libraries
 import React, { useState } from 'react';
-import { Compass } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 import WorldBanner from './WorldBanner';
 import styles from './LearningPath.module.css';
 
@@ -51,7 +52,7 @@ export default function LearningPath({ worlds = [], userName = '' }) {
       {/* ── Greeting & Roadmap Summary ─────────────────────────────── */}
       <div className={styles.headerArea}>
         <div className={styles.welcomePill}>
-          <Compass size={13} className={styles.compassIcon} />
+          <Navigation size={13} strokeWidth={2} className={styles.compassIcon} aria-hidden="true" />
           <span>Linux Mastery Path</span>
         </div>
 

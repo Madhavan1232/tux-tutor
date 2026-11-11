@@ -1,6 +1,7 @@
+// Icons: lucide-react only — do not mix libraries
 import React from 'react';
 import { AlertTriangle, RefreshCw, Terminal } from 'lucide-react';
-import Tux from '../../components/ui/Tux';
+import TuxModel from '../../components/TuxModel';
 import ProgressBar from '../../components/ui/ProgressBar';
 import styles from './BootScreen.module.css';
 
@@ -21,7 +22,7 @@ export default function BootScreen({ progress, error, onRetry }) {
       <div className={styles.container}>
         {/* Tux Mascot */}
         <div className={styles.mascotWrap}>
-          <Tux mood={isError ? 'sleep' : 'think'} size={110} />
+          <TuxModel size={110} animate={!isError} locked={isError} />
         </div>
 
         {/* Header */}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getStoredToken, clearStoredAuth } from '../../utils/auth';
 
 /**
  * useDashboardData — fetches all dashboard data from /api/dashboard.
@@ -26,7 +27,16 @@ export function useDashboardData() {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token') ?? '';
+        const token = getStoredToken();
+        if (!token) {
+          if (!cancelled) {
+            setError('No authentication token found. Please sign in.');
+            setData(null);
+            setLoading(false);
+          }
+          return;
+        }
+
         const res = await fetch(`${API_BASE}/api/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -34,6 +44,9 @@ export function useDashboardData() {
         });
 
         if (!res.ok) {
+          if (res.status === 401) {
+            clearStoredAuth();
+          }
           const body = await res.json().catch(() => ({}));
           throw new Error(body.error || `Server responded with ${res.status} ${res.statusText}`);
         }

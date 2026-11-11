@@ -53,7 +53,6 @@
 /* ── 2. Tux Slot ────────────────────────────────────────────────────── */
 .tuxSlot {
   margin-bottom: -4px;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
   transition: transform 200ms ease;
 }
 

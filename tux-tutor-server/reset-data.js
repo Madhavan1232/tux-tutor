@@ -1,63 +1,114 @@
-require('dotenv').config();
-
+const path = require('path');
+const dotenv = require('dotenv');
 const { PrismaClient } = require('@prisma/client');
 
-// Confirm which DB we're hitting before anything else
-const dbUrl = process.env.DATABASE_URL || '(DATABASE_URL not set!)';
-const dbHost = (() => {
-  try { return new URL(dbUrl).hostname; } catch { return dbUrl; }
-})();
-console.log(`\n🔌 Connecting to: ${dbHost}`);
-if (dbHost.includes('localhost') || dbHost === '127.0.0.1') {
-  console.error('⚠️  WARNING: Connected to LOCALHOST — not Neon! Check your .env file.');
-} else {
-  console.log('✅ Neon (remote) database confirmed.\n');
+// Always load tux-tutor-server/.env regardless of caller CWD and override stale shell env vars
+const envPath = path.resolve(__dirname, '.env');
+const envResult = dotenv.config({ path: envPath, override: true });
+
+if (envResult.error) {
+  console.warn(`⚠️  Warning loading ${envPath}: ${envResult.error.message}`);
 }
 
-const prisma = new PrismaClient();
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  console.error(`❌ DATABASE_URL is not set. Checked ${envPath}`);
+  process.exit(1);
+}
 
+const parsedDb = (() => {
+  try {
+    const url = new URL(databaseUrl);
+    return { host: url.hostname, database: url.pathname.replace(/^\//, '') || '(default)' };
+  } catch {
+    return { host: '(invalid URL)', database: '(unknown)' };
+  }
+})();
+
+console.log(`\n🔌 Target database: ${parsedDb.host}/${parsedDb.database}`);
+if (parsedDb.host.includes('localhost') || parsedDb.host === '127.0.0.1') {
+  console.warn('⚠️  WARNING: Connected to LOCALHOST — verify DATABASE_URL in tux-tutor-server/.env if expecting Neon.');
+} else {
+  console.log('✅ Remote/Neon PostgreSQL database confirmed.\n');
+}
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: { url: databaseUrl },
+  },
+});
+
+const DELETION_STEPS = [
+  { name: 'LoginLog', delegate: () => prisma.loginLog },
+  { name: 'Otp', delegate: () => prisma.otp },
+  { name: 'PasswordResetToken', delegate: () => prisma.passwordResetToken },
+  { name: 'XpEvent', delegate: () => prisma.xpEvent },
+  { name: 'Achievement', delegate: () => prisma.achievement },
+  { name: 'UserMission', delegate: () => prisma.userMission },
+  { name: 'User', delegate: () => prisma.user },
+];
+
+/**
+ * Deletes all user and authentication records in FK-safe order while preserving World and Mission tables.
+ */
 async function resetData() {
-  console.log('--- Cleaning user data from active database ---');
-  
-  // 1. Delete dependent user data
-  const delUserMissions = await prisma.userMission.deleteMany();
-  console.log(`Deleted UserMissions: ${delUserMissions.count}`);
+  let hasErrors = false;
 
-  const delAchievements = await prisma.achievement.deleteMany();
-  console.log(`Deleted Achievements: ${delAchievements.count}`);
+  try {
+    await prisma.$connect();
+    console.log('✅ Connected to PostgreSQL via Prisma.\n');
+  } catch (err) {
+    console.error('❌ Failed to connect to database:', err.message);
+    process.exitCode = 1;
+    return;
+  }
 
-  const delXpEvents = await prisma.xpEvent.deleteMany();
-  console.log(`Deleted XpEvents: ${delXpEvents.count}`);
+  console.log('--- Cleaning user and auth data from active database ---');
 
-  const delTokens = await prisma.passwordResetToken.deleteMany();
-  console.log(`Deleted PasswordResetTokens: ${delTokens.count}`);
+  for (const step of DELETION_STEPS) {
+    try {
+      const result = await step.delegate().deleteMany();
+      console.log(`✅ [OK] Deleted ${step.name}: ${result.count} row(s)`);
+    } catch (err) {
+      hasErrors = true;
+      console.error(`❌ [ERROR] Failed deleting ${step.name}: ${err.message}`);
+    }
+  }
 
-  // 2. Delete Users
-  const delUsers = await prisma.user.deleteMany();
-  console.log(`Deleted Users: ${delUsers.count}`);
+  console.log('\n--- Verification (Row Counts) ---');
+  try {
+    for (const step of DELETION_STEPS) {
+      const count = await step.delegate().count();
+      console.log(`  ${step.name}: ${count}`);
+      if (count !== 0) {
+        hasErrors = true;
+      }
+    }
 
-  // 3. Delete OTPs
-  const delOtps = await prisma.otp.deleteMany();
-  console.log(`Deleted OTP records: ${delOtps.count}`);
+    const worldCount = await prisma.world.count();
+    const missionCount = await prisma.mission.count();
+    console.log(`  World (preserved): ${worldCount}`);
+    console.log(`  Mission (preserved): ${missionCount}`);
+  } catch (err) {
+    hasErrors = true;
+    console.error(`❌ [ERROR] Verification query failed: ${err.message}`);
+  }
 
-  // 4. Delete LoginLogs
-  const delLogs = await prisma.loginLog.deleteMany();
-  console.log(`Deleted LoginLogs: ${delLogs.count}`);
-
-  console.log('--- Verification ---');
-  const userCount = await prisma.user.count();
-  const otpCount = await prisma.otp.count();
-  console.log(`Current User count: ${userCount}`);
-  console.log(`Current Otp count: ${otpCount}`);
-  console.log('All user and authentication records have been successfully wiped.');
+  if (hasErrors) {
+    console.error('\n⚠️  Database reset finished with errors.');
+    process.exitCode = 1;
+  } else {
+    console.log('\n✅ All user and authentication records have been reset (World & Mission preserved).');
+  }
 }
 
 resetData()
-  .catch((e) => {
-    console.error('Error resetting database:', e);
-    process.exit(1);
+  .catch((err) => {
+    console.error('❌ Unexpected error resetting database:', err);
+    process.exitCode = 1;
   })
   .finally(async () => {
     await prisma.$disconnect();
+    console.log('🔌 Disconnected from database.');
   });
 

@@ -1,3 +1,4 @@
+// Icons: lucide-react only — do not mix libraries
 import React, { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, HardDrive } from 'lucide-react';
 import FileTree from './FileTree';

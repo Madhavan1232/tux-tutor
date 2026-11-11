@@ -1,3 +1,5 @@
+// Icons: lucide-react only — do not mix libraries
+import { CheckCircle } from 'lucide-react';
 import styles from './MissionStats.module.css';
 
 /**
@@ -13,7 +15,10 @@ export default function MissionStats({ stats }) {
       <div className={styles.overline}>Progress</div>
       <div className={styles.grid}>
         <div className={styles.item}>
-          <span className={styles.value}>{missionsCompleted}</span>
+          <div className={styles.valueRow}>
+            <CheckCircle size={15} strokeWidth={2} className={styles.doneIcon} aria-hidden="true" />
+            <span className={styles.value}>{missionsCompleted}</span>
+          </div>
           <span className={styles.label}>Missions done</span>
         </div>
         <div className={styles.divider} aria-hidden="true" />

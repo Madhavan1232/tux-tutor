@@ -1,5 +1,7 @@
+// Icons: lucide-react only — do not mix libraries
 import * as React from "react";
 import { createPortal } from "react-dom";
+import { ChevronUp } from "lucide-react";
 import { UserButtonPopover } from "./UserButtonPopover";
 
 export interface TuxUserButtonProps {
@@ -15,11 +17,9 @@ export interface TuxUserButtonProps {
 
 function ChevronUpIcon({ isOpen }: { isOpen: boolean }) {
   return (
-    <svg
-      width="12"
-      height="8"
-      viewBox="0 0 12 8"
-      fill="currentColor"
+    <ChevronUp
+      size={15}
+      strokeWidth={2}
       style={{
         transition: "transform 150ms ease-out",
         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
@@ -27,9 +27,7 @@ function ChevronUpIcon({ isOpen }: { isOpen: boolean }) {
         flexShrink: 0,
       }}
       aria-hidden="true"
-    >
-      <path d="M1 7L6 2L11 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </svg>
+    />
   );
 }
 

@@ -6,8 +6,43 @@ const { generateAndStoreOtp, removeOtpRecord, verifyAndConsumeOtp, COOLDOWN_SECO
 const { sendOtpEmail, sendPasswordResetEmail } = require('../services/emailService');
 const prisma = require('../../db');
 const { recordLoginAttempt, recordSignupSuccess, logger } = require('../utils/logger');
+const { formatDisplayName } = require('../utils/displayName');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Serializes a Prisma User record for auth responses with resolved display name.
+ */
+function buildAuthUser(user) {
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    displayName: user.displayName?.trim() || null,
+    name: formatDisplayName(user),
+    xp: user.xp,
+    level: user.level,
+    streak: user.streak,
+    createdAt: user.createdAt,
+  };
+}
+
+/**
+ * Signs a JWT containing the user's identity and optional displayName.
+ */
+function signAuthToken(user, expiresIn) {
+  const secret = process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026';
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      displayName: user.displayName?.trim() || null,
+    },
+    secret,
+    { expiresIn }
+  );
+}
 
 /**
  * POST /api/auth/login and POST /auth/login
@@ -125,31 +160,14 @@ async function login(req, res) {
     const expiresIn = isRemembered ? '30d' : '15m';
 
     // Issue JWT
-    const secret = process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026';
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-      },
-      secret,
-      { expiresIn }
-    );
+    const token = signAuthToken(user, expiresIn);
 
     return res.status(200).json({
       success: true,
       message: 'Signed in successfully.',
       token,
       expiresIn,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        xp: user.xp,
-        level: user.level,
-        streak: user.streak,
-        createdAt: user.createdAt,
-      },
+      user: buildAuthUser(user),
     });
   } catch (err) {
     logger.error('Unexpected error during login process', { error: err.message, email });
@@ -236,7 +254,7 @@ async function sendOtp(req, res) {
  */
 async function verifyOtp(req, res) {
   try {
-    const { email, otp, password } = req.body;
+    const { email, otp, password, displayName, name } = req.body;
 
     if (!email || !EMAIL_REGEX.test(email.trim())) {
       return res.status(400).json({
@@ -259,6 +277,7 @@ async function verifyOtp(req, res) {
       email: normalizedEmail,
       otp: otp.trim(),
       password,
+      displayName: displayName || name,
     });
 
     if (isNewUser) {
@@ -271,30 +290,13 @@ async function verifyOtp(req, res) {
     }
 
     // Generate JWT
-    const secret = process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026';
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-      },
-      secret,
-      { expiresIn: '7d' }
-    );
+    const token = signAuthToken(user, '7d');
 
     return res.status(200).json({
       success: true,
       message: isNewUser ? 'Welcome to Tux Tutor! Account created.' : 'Welcome back! Signed in successfully.',
       token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        xp: user.xp,
-        level: user.level,
-        streak: user.streak,
-        createdAt: user.createdAt,
-      },
+      user: buildAuthUser(user),
     });
   } catch (err) {
     console.error('[verifyOtp Error]:', err.message);
@@ -319,6 +321,7 @@ async function getMe(req, res) {
         id: true,
         username: true,
         email: true,
+        displayName: true,
         xp: true,
         level: true,
         streak: true,
@@ -335,7 +338,7 @@ async function getMe(req, res) {
 
     return res.json({
       success: true,
-      user,
+      user: buildAuthUser(user),
     });
   } catch {
     return res.status(500).json({
@@ -658,12 +661,21 @@ async function findOrCreateGoogleUser({ googleId, email, name }) {
     },
   });
 
+  const cleanName = typeof name === 'string' && name.trim() ? name.trim() : null;
+
   if (user) {
-    // If user registered with email or another provider, link googleId to avoid duplicate accounts
+    // Link googleId and/or backfill missing displayName on existing accounts
+    const updateData = {};
     if (googleId && !user.googleId) {
+      updateData.googleId = String(googleId);
+    }
+    if (!user.displayName && cleanName) {
+      updateData.displayName = cleanName;
+    }
+    if (Object.keys(updateData).length > 0) {
       user = await prisma.user.update({
         where: { id: user.id },
-        data: { googleId: String(googleId) },
+        data: updateData,
       });
     }
     return { user, isNew: false };
@@ -684,6 +696,7 @@ async function findOrCreateGoogleUser({ googleId, email, name }) {
     data: {
       username,
       email: normalizedEmail,
+      displayName: cleanName,
       googleId: googleId ? String(googleId) : null,
       password: null,
       xp: 0,
@@ -739,24 +752,13 @@ async function handleGoogleAuth(req, res) {
       name: targetName,
     });
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email, username: user.username },
-      process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026',
-      { expiresIn: '7d' }
-    );
+    const token = signAuthToken(user, '7d');
 
     return res.status(200).json({
       success: true,
       token,
       isNew,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        level: user.level,
-        xp: user.xp,
-        streak: user.streak,
-      },
+      user: buildAuthUser(user),
       message: isNew
         ? 'Account successfully created with Google!'
         : 'Successfully signed in with Google!',
@@ -803,11 +805,7 @@ function handleGoogleCallback(req, res, next) {
     }
 
     const { user, isNew } = result;
-    const token = jwt.sign(
-      { id: user.id, email: user.email, username: user.username },
-      process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026',
-      { expiresIn: '7d' }
-    );
+    const token = signAuthToken(user, '7d');
 
     return res.redirect(`${clientBaseUrl}/?auth_token=${token}&is_new=${isNew}`);
   })(req, res, next);

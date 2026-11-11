@@ -1,3 +1,4 @@
+// Icons: lucide-react only — do not mix libraries
 import React, { useState } from 'react';
 import { BookOpen, FolderTree, Lightbulb } from 'lucide-react';
 import TaskTab from './TaskTab';

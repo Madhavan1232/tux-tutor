@@ -75,10 +75,12 @@ async function removeOtpRecord(otpId) {
  * @param {string} params.email
  * @param {string} params.otp
  * @param {string} [params.password] - Optional password to set on registration
+ * @param {string} [params.displayName] - Optional display name to store on profile
  * @returns {Promise<{ user: Object, isNewUser: boolean }>}
  */
-async function verifyAndConsumeOtp({ email, otp, password }) {
+async function verifyAndConsumeOtp({ email, otp, password, displayName }) {
   const normalizedEmail = email.toLowerCase().trim();
+  const cleanDisplayName = typeof displayName === 'string' && displayName.trim() ? displayName.trim() : null;
 
   // 1. Find the most recent active OTP for this email
   const record = await prisma.otp.findFirst({
@@ -156,6 +158,7 @@ async function verifyAndConsumeOtp({ email, otp, password }) {
         data: {
           email: normalizedEmail,
           username: generatedUsername,
+          displayName: cleanDisplayName,
           password: userPassword,
           xp: 0,
           level: 1,
