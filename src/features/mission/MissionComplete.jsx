@@ -53,7 +53,7 @@ export default function MissionComplete({ result, mission, onNextMission }) {
               <Zap size={18} className={styles.xpIcon} />
             </div>
             <div className={styles.statDetails}>
-              <span className={styles.statVal}>
+              <span className={`${styles.statVal} ${styles.xpStatVal}`}>
                 {isAlreadyCompleted ? '0 XP' : `+${xpEarned} XP`}
               </span>
               <span className={styles.statLabel}>

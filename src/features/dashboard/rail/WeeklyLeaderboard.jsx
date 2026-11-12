@@ -23,7 +23,10 @@ export default function WeeklyLeaderboard({ entries = [] }) {
             className={`${styles.row} ${entry.isCurrentUser ? styles.you : ''}`}
             aria-current={entry.isCurrentUser ? 'true' : undefined}
           >
-            <span className={styles.rankWrap} aria-label={`Rank ${entry.rank}`}>
+            <span
+              className={`${styles.rankWrap} ${entry.rank === 1 ? styles.rankFirst : ''}`}
+              aria-label={`Rank ${entry.rank}`}
+            >
               <Medal size={13} strokeWidth={2} className={styles.medalIcon} aria-hidden="true" />
               <span className={styles.rank}>{entry.rank}</span>
             </span>

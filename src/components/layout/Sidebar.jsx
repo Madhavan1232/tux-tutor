@@ -13,9 +13,9 @@ import {
 } from 'lucide-react';
 import TuxModel from '../TuxModel';
 import { useAuth } from '../../context/AuthContext';
+import { useUserProgress } from '../../context/userProgressStore';
 import { clearStoredAuth } from '../../utils/auth';
 import { formatDisplayName } from '../../utils/user';
-import { levelTitle } from '../../utils/levels';
 import styles from './Sidebar.module.css';
 
 /**
@@ -27,8 +27,6 @@ const NAV_ITEMS = [
   { to: '/badges',    label: 'Badges',   icon: Award,    key: 'badges' },
   { to: '/bosses',    label: 'Bosses',   icon: Flame,    key: 'bosses' },
   { to: '/ranking',   label: 'Ranking',  icon: Trophy,   key: 'ranking' },
-  { to: '/profile',   label: 'Profile',  icon: User,     key: 'profile' },
-  { to: '/settings',  label: 'Settings', icon: Settings, key: 'settings' },
 ];
 
 /**
@@ -46,9 +44,10 @@ export default function Sidebar({
   const location = useLocation();
   const navigate = useNavigate();
   const auth = useAuth();
+  const userProgress = useUserProgress();
 
   // Context takes priority; props serve as explicit overrides
-  const currentUser = propUser ?? auth.currentUser;
+  const currentUser = propUser ?? userProgress?.user ?? auth.currentUser;
   const authSignOut = propSignOut ?? auth.onSignOut;
 
   // ── User Popover State ───────────────────────────────────────────────
@@ -80,11 +79,7 @@ export default function Sidebar({
   const level = currentUser?.level ?? 1;
   const xp = currentUser?.xp ?? 0;
   const streak = currentUser?.streak ?? 0;
-  const rankTitle =
-    currentUser?.rank ||
-    currentUser?.title ||
-    (level === 1 ? 'Rockhopper' : levelTitle(level));
-  const levelText = `Lv.${level} · ${rankTitle}`;
+  const levelText = `Lv.${level} · ${xp.toLocaleString()} XP`;
 
   // Avatar initials: First letters of multi-word name, or first 2 chars of single word
   const nameParts = fullName.split(/\s+/).filter(Boolean);
@@ -134,7 +129,10 @@ export default function Sidebar({
         {/* Brand / Logo */}
         <NavLink to="/dashboard" className={styles.logo} aria-label="Tux Tutor">
           <TuxModel size={36} animate={false} />
-          <span className={styles.logoText}>Tux Tutor</span>
+          <span className={styles.appTitle}>
+            <span className={styles.titleTux}>TUX</span>{' '}
+            <span className={styles.titleTutor}>TUTOR</span>
+          </span>
         </NavLink>
 
         {/* Navigation Items */}
@@ -197,7 +195,12 @@ export default function Sidebar({
               </span>
               <span className={styles.userLevel} data-testid="user-level">
                 {levelText}
-                {streak > 0 && ` · 🔥 ${streak}d`}
+                {streak > 0 && (
+                  <>
+                    {' · '}
+                    <span className={styles.streakFireGlow}>🔥</span> {streak}d
+                  </>
+                )}
               </span>
             </div>
 
@@ -242,7 +245,7 @@ export default function Sidebar({
                   </span>
                   {streak > 0 && (
                     <span className={styles.popoverStreak}>
-                      🔥 {streak} day streak
+                      <span className={styles.streakFireGlow}>🔥</span> {streak} day streak
                     </span>
                   )}
                 </div>

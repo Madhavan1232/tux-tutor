@@ -1,14 +1,18 @@
 // Icons: lucide-react only — do not mix libraries
 import { CheckCircle } from 'lucide-react';
+import { useUserProgress } from '../../../context/userProgressStore';
 import styles from './MissionStats.module.css';
 
 /**
  * MissionStats — shows completed / total missions as large editoral numerals.
+ * Reads from the global UserProgressContext unless an explicit stats prop override is passed.
  *
- * @param {{ missionsCompleted: number, missionsTotal: number, totalXp: number }} stats
+ * @param {{ missionsCompleted: number, missionsTotal: number, totalXp: number }} [stats]
  */
 export default function MissionStats({ stats }) {
-  const { missionsCompleted = 0, missionsTotal = 0, totalXp = 0 } = stats ?? {};
+  const progress = useUserProgress();
+  const resolvedStats = stats ?? progress?.stats;
+  const { missionsCompleted = 0, missionsTotal = 0, totalXp = 0 } = resolvedStats ?? {};
 
   return (
     <section className={styles.section} aria-label="Mission progress">

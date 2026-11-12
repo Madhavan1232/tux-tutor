@@ -17,7 +17,10 @@ function optionalAuth(req, res, next) {
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (token) {
     try {
-      req.user = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026'
+      );
     } catch {
       // ignore invalid token for optional auth
     }

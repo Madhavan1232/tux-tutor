@@ -28,7 +28,7 @@ export const WORLD_THEMES = {
   1: {
     id: 1,
     slug: 'basics',
-    zoneTag: 'ZONE 01 // TERMINAL SHELL',
+    zoneTag: 'MODULE 01 · TERMINAL SHELL',
     bgGradient: 'linear-gradient(180deg, #0b151a 0%, #060c10 100%)',
     cardBg: '#091319',
     borderColor: 'rgba(16, 185, 129, 0.28)',
@@ -46,7 +46,7 @@ export const WORLD_THEMES = {
   2: {
     id: 2,
     slug: 'files',
-    zoneTag: 'ZONE 02 // FILESYSTEM HIERARCHY',
+    zoneTag: 'MODULE 02 · FILESYSTEM HIERARCHY',
     bgGradient: 'linear-gradient(180deg, #081728 0%, #040d17 100%)',
     cardBg: '#061423',
     borderColor: 'rgba(56, 189, 248, 0.28)',
@@ -64,7 +64,7 @@ export const WORLD_THEMES = {
   3: {
     id: 3,
     slug: 'pipes',
-    zoneTag: 'ZONE 03 // STREAMS & PIPELINES',
+    zoneTag: 'MODULE 03 · STREAMS & PIPELINES',
     bgGradient: 'linear-gradient(180deg, #150b22 0%, #0b0513 100%)',
     cardBg: '#12091e',
     borderColor: 'rgba(168, 85, 247, 0.28)',
@@ -82,7 +82,7 @@ export const WORLD_THEMES = {
   4: {
     id: 4,
     slug: 'permissions',
-    zoneTag: 'ZONE 04 // ACCESS & PERMISSIONS',
+    zoneTag: 'MODULE 04 · ACCESS & PERMISSIONS',
     bgGradient: 'linear-gradient(180deg, #1c1306 0%, #0e0902 100%)',
     cardBg: '#181005',
     borderColor: 'rgba(245, 158, 11, 0.28)',
@@ -100,7 +100,7 @@ export const WORLD_THEMES = {
   5: {
     id: 5,
     slug: 'processes',
-    zoneTag: 'ZONE 05 // DAEMONS & RUNTIME',
+    zoneTag: 'MODULE 05 · DAEMONS & RUNTIME',
     bgGradient: 'linear-gradient(180deg, #051b19 0%, #020d0c 100%)',
     cardBg: '#041715',
     borderColor: 'rgba(20, 184, 166, 0.28)',
@@ -118,7 +118,7 @@ export const WORLD_THEMES = {
   6: {
     id: 6,
     slug: 'networking',
-    zoneTag: 'ZONE 06 // PORTS & SOCKETS',
+    zoneTag: 'MODULE 06 · PORTS & SOCKETS',
     bgGradient: 'linear-gradient(180deg, #091228 0%, #030815 100%)',
     cardBg: '#070f22',
     borderColor: 'rgba(99, 102, 241, 0.28)',
@@ -136,7 +136,7 @@ export const WORLD_THEMES = {
   7: {
     id: 7,
     slug: 'scripting',
-    zoneTag: 'ZONE 07 // SCRIPTING AUTOMATION',
+    zoneTag: 'MODULE 07 · SCRIPTING AUTOMATION',
     bgGradient: 'linear-gradient(180deg, #1e0714 0%, #0e0209 100%)',
     cardBg: '#190510',
     borderColor: 'rgba(244, 63, 94, 0.28)',
@@ -154,7 +154,7 @@ export const WORLD_THEMES = {
   8: {
     id: 8,
     slug: 'sysadmin',
-    zoneTag: 'ZONE 08 // ROOT FORTRESS',
+    zoneTag: 'MODULE 08 · ROOT FORTRESS',
     bgGradient: 'linear-gradient(180deg, #1b0505 0%, #0c0101 100%)',
     cardBg: '#170303',
     borderColor: 'rgba(220, 38, 38, 0.35)',

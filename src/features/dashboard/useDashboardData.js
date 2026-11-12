@@ -1,75 +1,35 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getStoredToken, clearStoredAuth } from '../../utils/auth';
+import { useCallback, useEffect } from 'react';
+import { useUserProgress } from '../../context/userProgressStore';
 
 /**
- * useDashboardData — fetches all dashboard data from /api/dashboard.
- * Surfaces real API errors directly to the UI without silent mock fallbacks.
+ * useDashboardData — reads unified user progress & dashboard data from
+ * UserProgressContext so Dashboard, Right Rail, and Sidebar share a single
+ * global source of truth.
  *
  * Returns: { data, loading, error, refetch }
  */
-
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:5000';
-
 export function useDashboardData() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [trigger, setTrigger] = useState(0);
-
-  const refetch = useCallback(() => {
-    setTrigger((prev) => prev + 1);
-  }, []);
+  const progress = useUserProgress();
+  const refreshIfStale = progress?.refreshIfStale;
+  const refreshUserProgress = progress?.refreshUserProgress;
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function fetchDashboard() {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = getStoredToken();
-        if (!token) {
-          if (!cancelled) {
-            setError('No authentication token found. Please sign in.');
-            setData(null);
-            setLoading(false);
-          }
-          return;
-        }
-
-        const res = await fetch(`${API_BASE}/api/dashboard`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          if (res.status === 401) {
-            clearStoredAuth();
-          }
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || `Server responded with ${res.status} ${res.statusText}`);
-        }
-        const json = await res.json();
-        if (!cancelled) {
-          setData(json);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.error('[useDashboardData] Fetch failed:', err);
-          setError(err.message || 'Failed to connect to the learning server.');
-          setData(null);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+    if (refreshIfStale) {
+      void refreshIfStale();
     }
+  }, [refreshIfStale]);
 
-    fetchDashboard();
-    return () => {
-      cancelled = true;
-    };
-  }, [trigger]);
+  const refetch = useCallback(() => {
+    if (refreshUserProgress) {
+      return refreshUserProgress({ force: true });
+    }
+    return Promise.resolve(null);
+  }, [refreshUserProgress]);
 
-  return { data, loading, error, refetch };
+  return {
+    data: progress?.data ?? null,
+    loading: progress?.loading ?? false,
+    error: progress?.error ?? null,
+    refetch,
+  };
 }

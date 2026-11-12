@@ -36,8 +36,8 @@
 
 /* Current user highlight */
 .you {
-  background-color: var(--color-accent-muted);
-  border: 1px solid rgba(220, 38, 38, 0.2);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .rankWrap {
@@ -48,6 +48,11 @@
   width: 2.25rem;
   color: var(--color-text-secondary);
   flex-shrink: 0;
+}
+
+.rankFirst {
+  color: var(--color-gold);
+  font-weight: var(--weight-bold);
 }
 
 .medalIcon {
@@ -62,8 +67,12 @@
 }
 
 .you .rankWrap {
-  color: var(--color-accent);
+  color: var(--color-text-primary);
   font-weight: var(--weight-bold);
+}
+
+.you .rankWrap.rankFirst {
+  color: var(--color-gold);
 }
 
 .avatar {
@@ -80,20 +89,20 @@
 }
 
 .you .username {
-  color: var(--color-accent);
+  color: var(--color-text-primary);
   font-weight: var(--weight-bold);
 }
 
 .xp {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  color: var(--color-gold);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
   letter-spacing: var(--tracking-wide);
 }
 
 .you .xp {
-  color: var(--color-accent);
+  color: var(--color-gold);
   font-weight: var(--weight-bold);
 }

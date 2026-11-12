@@ -51,8 +51,8 @@
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #E53E3E;
-  text-shadow: 0 2px 14px rgba(229, 62, 62, 0.45);
+  color: var(--color-gold, #C9A84C);
+  text-shadow: 0 2px 14px var(--color-gold-glow, rgba(201, 168, 76, 0.45));
   opacity: 0;
   transform: translateY(10px) scale(0.92);
   animation: xpReveal 500ms cubic-bezier(0.16, 1, 0.3, 1) 1500ms forwards;
@@ -64,7 +64,7 @@
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #E53E3E;
+  color: var(--color-gold, #C9A84C);
   opacity: 1;
 }
 

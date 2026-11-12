@@ -16,7 +16,10 @@ function authMiddleware(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'tux_tutor_super_secret_jwt_key_2026'
+    );
     req.user = decoded; // { id, username, email, iat, exp }
     next();
   } catch {

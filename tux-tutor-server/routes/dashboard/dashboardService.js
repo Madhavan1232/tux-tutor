@@ -80,7 +80,7 @@ async function getDashboardData(userId) {
 
   // Fetch user's completed missions
   const userMissions = await prisma.userMission.findMany({
-    where: { userId },
+    where: { userId, status: 'completed' },
     select: { missionId: true },
   });
   const completedIds = new Set(userMissions.map((um) => um.missionId));
@@ -162,12 +162,12 @@ async function getDashboardData(userId) {
     0
   );
 
-  // Total XP from XpEvents
+  // Total XP from XpEvents (fallback to user.xp if events haven't been backfilled)
   const xpAgg = await prisma.xpEvent.aggregate({
     where: { userId },
     _sum: { amount: true },
   });
-  const totalXp = xpAgg._sum.amount ?? 0;
+  const totalXp = Math.max(xpAgg._sum.amount ?? 0, user.xp ?? 0);
 
   // Weekly leaderboard — sum XP events over last 7 days
   const sevenDaysAgo = new Date();

@@ -15,6 +15,22 @@
   font-weight: var(--weight-bold);
 }
 
+.flameGlow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background-color: var(--color-gold-muted);
+  box-shadow: 0 0 10px var(--color-gold-glow);
+  color: var(--color-gold);
+}
+
+.flameIcon {
+  filter: drop-shadow(0 0 4px var(--color-gold-glow));
+}
+
 .row {
   display: flex;
   align-items: center;
@@ -31,7 +47,7 @@
   font-size: 3.5rem;
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-tight);
-  color: var(--color-text-primary);
+  color: var(--color-gold);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }

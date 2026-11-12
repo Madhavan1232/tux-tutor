@@ -26,31 +26,28 @@ export default function MissionNode({ mission, theme, index = 0, style }) {
   const isLocked = status === 'locked';
 
   return (
-    <motion.div
-      className={styles.wrapper}
-      style={style}
-      role="listitem"
-      initial={{ opacity: 0, scale: 0.75, y: 15 }}
-      whileInView={{ opacity: 1, scale: 1, y: 0 }}
-      viewport={{ once: true, margin: '-20px' }}
-      transition={{
-        duration: 0.45,
-        delay: Math.min(index * 0.08, 0.4),
-        ease: [0.16, 1, 0.3, 1],
-      }}
-    >
-      {/* ── 1. Floating "START" Badge for Current Node ─────────── */}
-      {isCurrent && (
-        <div className={styles.startBadge} aria-hidden="true">
-          <span className={styles.startBadgeText}>
-            <Play size={10} strokeWidth={2.2} aria-hidden="true" />
-            <span>START</span>
-          </span>
-        </div>
-      )}
-
-      {/* ── 2. The Gamified Node Button ─────────────────────────── */}
-      <div className={styles.nodeContainer}>
+    <div className={styles.wrapper} style={style} role="listitem">
+      <motion.div
+        className={styles.motionInner}
+        initial={{ opacity: 0, scale: 0.75, y: 15 }}
+        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.1 }}
+        transition={{
+          duration: 0.45,
+          delay: Math.min(index * 0.08, 0.4),
+          ease: [0.16, 1, 0.3, 1],
+        }}
+      >
+        {/* ── 1. The Gamified Node Button (centered on SVG waypoint) ── */}
+        <div className={styles.nodeContainer}>
+          {isCurrent && (
+            <div className={styles.startBadge} aria-hidden="true">
+              <span className={styles.startBadgeText}>
+                <Play size={10} strokeWidth={2.2} aria-hidden="true" />
+                <span>START</span>
+              </span>
+            </div>
+          )}
         {/* Continuous Radar Pulse Rings for Current Node */}
         {isCurrent && (
           <>
@@ -120,6 +117,7 @@ export default function MissionNode({ mission, theme, index = 0, style }) {
         <Zap size={11} className={styles.xpIcon} aria-hidden="true" />
         <span>+{xpReward} XP</span>
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

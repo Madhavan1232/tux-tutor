@@ -53,3 +53,56 @@ test('Test 5: Popover closes when clicking outside', async ({ page }) => {
   await page.mouse.click(10, 10);
   await expect(page.getByTestId('user-popover')).not.toBeVisible();
 });
+
+test('Test 6: Sidebar omits Profile and Settings tabs while popover retains them', async ({ page }) => {
+  const sidebarNav = page.getByRole('complementary', { name: 'Main navigation' }).locator('nav');
+  await expect(sidebarNav.getByRole('link')).toHaveCount(5);
+  await expect(sidebarNav.getByRole('link', { name: 'Profile' })).toHaveCount(0);
+  await expect(sidebarNav.getByRole('link', { name: 'Settings' })).toHaveCount(0);
+
+  const mobileNav = page.locator('nav[aria-label="Mobile navigation"]');
+  await expect(mobileNav.locator('a')).toHaveCount(5);
+  await expect(mobileNav.locator('a[aria-label="Profile"]')).toHaveCount(0);
+  await expect(mobileNav.locator('a[aria-label="Settings"]')).toHaveCount(0);
+
+  await page.getByTestId('user-button').click();
+  const popover = page.getByTestId('user-popover');
+  await expect(popover.getByRole('button', { name: 'View Profile' })).toBeVisible();
+  await expect(popover.getByRole('button', { name: 'Settings' })).toBeVisible();
+});
+
+test('Test 7: Sidebar brand title renders TUX (bold charcoal) + TUTOR (semibold gold) in Space Grotesk', async ({ page }) => {
+  const brandLink = page.getByRole('complementary', { name: 'Main navigation' }).getByRole('link', { name: 'Tux Tutor' });
+  await expect(brandLink).toBeVisible();
+
+  const tuxSpan = brandLink.locator('span', { hasText: /^TUX$/ });
+  const tutorSpan = brandLink.locator('span', { hasText: /^TUTOR$/ });
+  await expect(tuxSpan).toBeVisible();
+  await expect(tutorSpan).toBeVisible();
+
+  const tuxStyle = await tuxSpan.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    return { fontFamily: cs.fontFamily, fontSize: cs.fontSize, fontWeight: cs.fontWeight, color: cs.color, letterSpacing: cs.letterSpacing };
+  });
+  const tutorStyle = await tutorSpan.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    return { fontFamily: cs.fontFamily, fontSize: cs.fontSize, fontWeight: cs.fontWeight, color: cs.color };
+  });
+  const navLabelFont = await page
+    .getByRole('complementary', { name: 'Main navigation' })
+    .locator('nav a span')
+    .nth(1)
+    .evaluate((el) => getComputedStyle(el).fontFamily);
+
+  expect(tuxStyle.fontFamily).toContain('Space Grotesk');
+  expect(tuxStyle.fontSize).toBe('20px');
+  expect(tuxStyle.fontWeight).toBe('700');
+  expect(tuxStyle.color).toBe('rgb(29, 29, 31)');
+
+  expect(tutorStyle.fontFamily).toContain('Space Grotesk');
+  expect(tutorStyle.fontSize).toBe('20px');
+  expect(tutorStyle.fontWeight).toBe('600');
+  expect(tutorStyle.color).toBe('rgb(201, 168, 76)');
+
+  expect(navLabelFont).not.toContain('Space Grotesk');
+});

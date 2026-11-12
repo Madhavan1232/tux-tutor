@@ -33,7 +33,7 @@
 }
 
 .doneIcon {
-  color: var(--color-accent);
+  color: var(--color-text-secondary);
   flex-shrink: 0;
 }
 

@@ -24,7 +24,7 @@
 .levelNum {
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
-  color: var(--color-text-primary);
+  color: var(--color-gold);
   letter-spacing: var(--tracking-snug);
 }
 
@@ -37,12 +37,12 @@
 .xpCurrent {
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
-  color: var(--color-text-primary);
+  color: var(--color-gold);
   font-variant-numeric: tabular-nums;
 }
 
 .xpNext {
   font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+  color: var(--color-gold);
   font-variant-numeric: tabular-nums;
 }

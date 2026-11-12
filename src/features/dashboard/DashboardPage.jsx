@@ -82,11 +82,11 @@ export default function DashboardPage() {
   /* ── Right Rail ─────────────────────────────────────────────────────── */
   const rail = (
     <>
-      <StreakStat streak={data?.streak} />
+      <StreakStat />
       <div className={styles.railDivider} aria-hidden="true" />
-      <LevelXp user={data?.user} />
+      <LevelXp />
       <div className={styles.railDivider} aria-hidden="true" />
-      <MissionStats stats={data?.stats} />
+      <MissionStats />
       <div className={styles.railDivider} aria-hidden="true" />
       <TodaysMission mission={data?.todaysMission} />
       <div className={styles.railDivider} aria-hidden="true" />

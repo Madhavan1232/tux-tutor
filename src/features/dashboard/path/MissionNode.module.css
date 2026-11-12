@@ -1,19 +1,29 @@
 .wrapper {
   position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  transform: translate(-50%, -50%);
+  /* Center (left: x, top: y) on the 56px circular node button inside .motionInner */
+  transform: translate(-50%, -28px);
   width: 140px;
   z-index: 5;
   user-select: none;
 }
 
+.motionInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
 /* ── 1. Floating START Badge ────────────────────────────────────────── */
 .startBadge {
   position: absolute;
-  bottom: calc(100% - 10px);
+  bottom: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
   z-index: 10;
   animation: bounceFloat 2s ease-in-out infinite;
 }
@@ -47,6 +57,8 @@
 /* ── 2. Node Container & Radar Pulse Rings ─────────────────────────── */
 .nodeContainer {
   position: relative;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,8 +96,10 @@
 
 /* ── 3. The Node Button ────────────────────────────────────────────── */
 .node {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
+  box-sizing: border-box;
+  padding: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -133,8 +147,8 @@
 
 /* ── Node State: Current / Active ──────────────────────────────────── */
 .current {
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
   background: var(--node-accent);
   border-color: #FFFFFF;
   color: #FFFFFF;
@@ -234,16 +248,16 @@
 }
 
 .xpBadgeCompleted {
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--color-gold);
+  background: var(--color-gold-muted);
+  border: 1px solid rgba(201, 168, 76, 0.35);
 }
 
 .xpBadgeCurrent {
-  color: #FFFFFF;
-  background: var(--badge-accent);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 2px 8px var(--badge-glow);
+  color: var(--color-gold);
+  background: var(--color-gold-muted);
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  box-shadow: 0 2px 10px var(--color-gold-glow);
 }
 
 .xpBadgeLocked {

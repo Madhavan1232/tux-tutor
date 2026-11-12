@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getStoredToken } from '../../utils/auth';
+import { useUserProgress } from '../../context/userProgressStore';
+import { estimateMissionXpReward } from '../../utils/progressState';
 
 /**
  * useMission — Coordinates mission data fetching, start recording,
@@ -16,6 +18,12 @@ export function useMission(missionId) {
   const [isRevealingHint, setIsRevealingHint] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const [completionResult, setCompletionResult] = useState(null);
+
+  const userProgress = useUserProgress();
+  const userProgressRef = useRef(userProgress);
+  useEffect(() => {
+    userProgressRef.current = userProgress;
+  }, [userProgress]);
 
   const startTimeRef = useRef(null);
   useEffect(() => {
@@ -140,8 +148,27 @@ export function useMission(missionId) {
   const completeMission = useCallback(async () => {
     setIsCompleting(true);
     const elapsedSeconds = Math.round((Date.now() - startTimeRef.current) / 1000);
+    const progressCtx = userProgressRef.current;
+
+    const alreadyCompleted = mission?.userProgress?.status === 'completed';
+    const effectiveHints = Math.max(
+      hintsUsed,
+      revealedHints.length,
+      mission?.hintsUsed || 0
+    );
+    const optimisticXp = alreadyCompleted
+      ? 0
+      : estimateMissionXpReward(mission?.xpReward, effectiveHints);
+
+    // 1. Optimistically update shared XP & progress state immediately
+    const rollbackOptimistic = progressCtx?.applyOptimisticProgress?.({
+      missionId: Number(missionId),
+      earnedXp: optimisticXp,
+      alreadyCompleted,
+    });
 
     try {
+      // 2. Complete mission API call
       const res = await fetch(`/api/missions/${missionId}/complete`, {
         method: 'POST',
         headers: getHeaders(),
@@ -150,20 +177,42 @@ export function useMission(missionId) {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
+        rollbackOptimistic?.();
         throw new Error(data.error || 'Failed to record completion');
       }
 
+      // Sync exact server-confirmed XP, level, and streak right away
+      progressCtx?.syncCompletionResult?.(data, { missionId: Number(missionId) });
+      setMission((prev) =>
+        prev
+          ? {
+              ...prev,
+              userProgress: {
+                ...(prev.userProgress ?? {}),
+                status: 'completed',
+              },
+            }
+          : prev
+      );
+
+      // 3. Re-fetch full user progress from backend before triggering success animation
+      if (progressCtx?.refreshUserProgress) {
+        await progressCtx.refreshUserProgress({ silent: true, force: true });
+      }
+
+      // 4. Trigger TuxCelebration -> MissionComplete modal
       setCompletionResult(data);
       return data;
     } catch (err) {
+      rollbackOptimistic?.();
       console.error('[useMission] Error completing mission:', err);
       throw err;
     } finally {
       setIsCompleting(false);
     }
-  }, [missionId, getHeaders]);
+  }, [missionId, mission?.xpReward, mission?.hintsUsed, mission?.userProgress?.status, hintsUsed, revealedHints.length, getHeaders]);
 
   return {
     mission,

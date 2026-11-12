@@ -145,5 +145,192 @@ test.describe('Dashboard Welcome Message & Display Name', () => {
     await expect(heading).toHaveText('Welcome back, Madhavanvairava.');
     await expect(page.getByTestId('user-name')).toHaveText('Madhavanvairava');
   });
+
+  test('renders redesigned module card labels, cleared pill, progress text, and metadata', async ({
+    page,
+  }) => {
+    const consoleErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      }
+    });
+
+    await page.route('**/api/auth/me', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          user: {
+            id: 1,
+            username: 'madhavan',
+            email: 'madhavan@example.com',
+            displayName: 'Madhavan',
+            name: 'Madhavan',
+            level: 2,
+            xp: 650,
+            streak: 3,
+          },
+        }),
+      });
+    });
+
+    await page.route('**/api/dashboard', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: {
+            name: 'Madhavan',
+            displayName: 'Madhavan',
+            level: 2,
+            xp: 650,
+            xpToNext: 1000,
+          },
+          streak: { current: 3, best: 3, activeToday: true },
+          stats: { missionsCompleted: 11, missionsTotal: 18, totalXp: 650 },
+          worlds: [
+            {
+              id: 1,
+              name: 'Terminal Shell',
+              orderIndex: 1,
+              unlocked: true,
+              progress: 100,
+              missions: [
+                { id: 1, title: 'M1', status: 'completed', xpReward: 50 },
+                { id: 2, title: 'M2', status: 'completed', xpReward: 50 },
+                { id: 3, title: 'M3', status: 'completed', xpReward: 50 },
+                { id: 4, title: 'M4', status: 'completed', xpReward: 50 },
+                { id: 5, title: 'M5', status: 'completed', xpReward: 50 },
+              ],
+              boss: { id: 101, status: 'completed' },
+            },
+            {
+              id: 2,
+              name: 'Filesystem Hierarchy',
+              orderIndex: 2,
+              unlocked: true,
+              progress: 83,
+              missions: [
+                { id: 6, title: 'M6', status: 'completed', xpReward: 50 },
+                { id: 7, title: 'M7', status: 'completed', xpReward: 50 },
+                { id: 8, title: 'M8', status: 'completed', xpReward: 50 },
+                { id: 9, title: 'M9', status: 'completed', xpReward: 50 },
+                { id: 10, title: 'M10', status: 'completed', xpReward: 50 },
+              ],
+              boss: { id: 102, status: 'current' },
+            },
+            {
+              id: 3,
+              name: 'Streams & Pipelines',
+              orderIndex: 3,
+              unlocked: false,
+              progress: 0,
+              missions: [{ id: 11, title: 'M11', status: 'locked', xpReward: 50 }],
+              boss: null,
+            },
+          ],
+          todaysMission: {
+            id: 102,
+            title: 'Boss · Filesystem Hierarchy',
+            worldName: 'Filesystem Hierarchy',
+            xpReward: 150,
+          },
+          leaderboard: [],
+          nextWorld: null,
+        }),
+      });
+    });
+
+    await page.addInitScript(() => {
+      localStorage.setItem('token', 'mock-jwt-token');
+      localStorage.setItem('tux_token', 'mock-jwt-token');
+      localStorage.setItem(
+        'tux_user',
+        JSON.stringify({
+          id: 1,
+          username: 'madhavan',
+          email: 'madhavan@example.com',
+          level: 2,
+          xp: 650,
+        })
+      );
+    });
+
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+
+    const world1 = page.getByRole('region', { name: 'World 1: Terminal Shell' });
+    await expect(world1).toBeVisible();
+
+    const zoneTag1 = world1.getByText('MODULE 01 · TERMINAL SHELL');
+    await expect(zoneTag1).toBeVisible();
+    const zoneTagStyles = await zoneTag1.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return {
+        fontSize: s.fontSize,
+        letterSpacing: s.letterSpacing,
+        fontVariantCaps: s.fontVariantCaps,
+        borderTopWidth: s.borderTopWidth,
+        backgroundColor: s.backgroundColor,
+        color: s.color,
+      };
+    });
+    expect(zoneTagStyles.fontSize).toBe('11px');
+    expect(zoneTagStyles.letterSpacing).toBe('1.1px');
+    expect(zoneTagStyles.fontVariantCaps).toBe('small-caps');
+    expect(zoneTagStyles.borderTopWidth).toBe('0px');
+    expect(zoneTagStyles.backgroundColor).toBe('rgba(0, 0, 0, 0)');
+
+    const clearedPill = world1.getByText('Cleared');
+    await expect(clearedPill).toBeVisible();
+    await expect(clearedPill.locator('svg')).toHaveCount(1);
+    const pillStyles = await clearedPill.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return {
+        backgroundColor: s.backgroundColor,
+        color: s.color,
+        fontSize: s.fontSize,
+        borderRadius: s.borderRadius,
+        padding: s.padding,
+      };
+    });
+    expect(pillStyles.backgroundColor).toBe('rgba(201, 168, 76, 0.125)');
+    expect(pillStyles.color).toBe('rgb(201, 168, 76)');
+    expect(pillStyles.fontSize).toBe('11px');
+    expect(pillStyles.borderRadius).toBe('4px');
+    expect(pillStyles.padding).toBe('2px 8px');
+
+    const worldTitle1 = world1.getByRole('heading', { level: 3, name: 'Terminal Shell' });
+    const titleStyles = await worldTitle1.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { fontSize: s.fontSize, fontWeight: s.fontWeight, color: s.color };
+    });
+    expect(titleStyles.fontSize).toBe('18px');
+    expect(titleStyles.fontWeight).toBe('600');
+    expect(titleStyles.color).toBe('rgb(255, 255, 255)');
+
+    await expect(world1.getByText('100%', { exact: true })).toBeVisible();
+    await expect(world1.getByText('6 / 6 missions completed')).toBeVisible();
+
+    const world2 = page.getByRole('region', { name: 'World 2: Filesystem Hierarchy' });
+    await expect(world2.getByText('MODULE 02 · FILESYSTEM HIERARCHY')).toBeVisible();
+    await expect(world2.getByText('83%', { exact: true })).toBeVisible();
+    await expect(world2.getByText('5 / 6 missions completed')).toBeVisible();
+
+    const world2Toggle = world2.locator('button[aria-controls="world-2-path"]');
+    if ((await world2Toggle.getAttribute('aria-expanded')) !== 'true') {
+      await world2Toggle.click();
+    }
+    await expect(world2.getByText('6 missions · ~45 min')).toBeVisible();
+    await expect(world2.getByText(/Winding Mission Path/i)).toHaveCount(0);
+    await expect(world2.getByText(/Advance along the path/i)).toHaveCount(0);
+
+    const world3 = page.getByRole('region', { name: 'World 3: Streams & Pipelines' });
+    await expect(world3.getByText('LOCKED MODULE')).toBeVisible();
+    await expect(world3.getByText('Complete Module 02 to unlock')).toBeVisible();
+
+    expect(consoleErrors).toEqual([]);
+  });
 });
 

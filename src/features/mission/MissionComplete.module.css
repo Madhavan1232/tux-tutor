@@ -108,6 +108,10 @@
   color: var(--color-text-primary);
 }
 
+.xpStatVal {
+  color: var(--color-gold);
+}
+
 .statLabel {
   font-size: 11px;
   color: var(--color-text-secondary);

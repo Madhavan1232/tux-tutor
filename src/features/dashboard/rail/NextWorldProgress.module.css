@@ -28,6 +28,6 @@
 }
 
 .remaining {
-  color: var(--color-accent);
+  color: var(--color-text-primary);
   font-weight: var(--weight-semibold);
 }

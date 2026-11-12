@@ -1,16 +1,20 @@
 // Icons: lucide-react only — do not mix libraries
 import { Zap } from 'lucide-react';
 import ProgressBar from '../../../components/ui/ProgressBar';
+import { useUserProgress } from '../../../context/userProgressStore';
 import { levelLabel } from '../../../utils/levels';
 import styles from './LevelXp.module.css';
 
 /**
  * LevelXp — shows level number, rank title, and XP progress bar.
+ * Reads from the global UserProgressContext unless an explicit user prop override is passed.
  *
- * @param {{ level: number, xp: number, xpToNext: number }} user
+ * @param {{ level: number, xp: number, xpToNext: number }} [user]
  */
 export default function LevelXp({ user }) {
-  const { level = 1, xp = 0, xpToNext = 100 } = user ?? {};
+  const progress = useUserProgress();
+  const resolvedUser = user ?? progress?.user;
+  const { level = 1, xp = 0, xpToNext = 500 } = resolvedUser ?? {};
   const label = levelLabel(level);
 
   return (

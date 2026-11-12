@@ -1,7 +1,8 @@
-import { Suspense, lazy, useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
 import { AuthContext } from './context/AuthContext';
+import { UserProgressProvider } from './context/UserProgressContext';
 import { getStoredToken, clearStoredAuth } from './utils/auth';
 import { formatDisplayName } from './utils/user';
 import TuxLoader from './components/TuxLoader';
@@ -66,6 +67,8 @@ export default function App() {
 
   const [authNotice, setAuthNotice] = useState('');
   const [prefilledEmail, setPrefilledEmail] = useState('');
+  const [authSessionKey, setAuthSessionKey] = useState(0);
+  const hasLocalProgressMutationRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -77,31 +80,43 @@ export default function App() {
   // Refresh user profile from /api/auth/me when a JWT exists so displayName stays synced
   useEffect(() => {
     const token = getStoredToken();
-    if (!token) return;
+    if (!token) return undefined;
 
-    let cancelled = false;
+    const controller = new AbortController();
     fetch(`${API_BASE}/api/auth/me`, {
+      cache: 'no-store',
+      signal: controller.signal,
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (res.status === 401) {
           clearStoredAuth();
-          if (!cancelled) setCurrentUser(null);
+          setCurrentUser(null);
           return null;
         }
         return res.ok ? res.json() : null;
       })
       .then((data) => {
-        if (!cancelled && data?.user) {
-          setCurrentUser(data.user);
+        if (!controller.signal.aborted && data?.user) {
+          setCurrentUser((prev) => {
+            if (!prev || !hasLocalProgressMutationRef.current) {
+              return data.user;
+            }
+            return {
+              ...data.user,
+              xp: prev.xp ?? data.user.xp,
+              level: prev.level ?? data.user.level,
+              streak: prev.streak ?? data.user.streak,
+            };
+          });
         }
       })
       .catch(() => {
-        // Ignore network errors during background profile sync
+        // Ignore network/abort errors during background profile sync
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, []);
 
@@ -119,12 +134,21 @@ export default function App() {
   }, [currentUser]);
 
   const handleAuthSuccess = (userData) => {
+    hasLocalProgressMutationRef.current = false;
+    setAuthSessionKey((k) => k + 1);
     setCurrentUser(userData);
   };
 
   const handleSignOut = () => {
+    hasLocalProgressMutationRef.current = false;
+    clearStoredAuth();
+    setAuthSessionKey((k) => k + 1);
     setCurrentUser(null);
   };
+
+  const handleProgressMutated = useCallback(() => {
+    hasLocalProgressMutationRef.current = true;
+  }, []);
 
   const handleNavigateToLoginFromReset = (email = '', notice = '') => {
     try {
@@ -155,47 +179,56 @@ export default function App() {
     );
   } else {
     content = (
-      <AuthContext.Provider value={{ currentUser, onSignOut: handleSignOut }}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/sidebar" element={<SidebarPreviewPage currentUser={currentUser} />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/missions/:id" element={<MissionPage />} />
-            <Route path="/terminal" element={<Navigate to="/missions/1" replace />} />
-            <Route path="/badges" element={<Placeholder title="Badges" />} />
-            <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
-            <Route path="/ranking" element={<Placeholder title="Leaderboard" />} />
-            <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
-            <Route
-              path="/profile"
-              element={
-                <AppShell>
-                  <div className={styles.placeholder}>
-                    <span className={styles.placeholderOverline}>Active Session</span>
-                    <h1 className={styles.placeholderTitle}>
-                      {formatDisplayName(currentUser) || currentUser.email || currentUser.username}
-                    </h1>
-                    <p className={styles.placeholderText}>
-                      {currentUser.email ? `${currentUser.email} · ` : ''}
-                      Authenticated operative ID: <code>UID: {currentUser.id}</code>
-                    </p>
-                    <button
-                      type="button"
-                      className="apple-btn-secondary"
-                      onClick={handleSignOut}
-                      style={{ marginTop: '16px' }}
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                </AppShell>
-              }
-            />
-            <Route path="/settings" element={<Placeholder title="Settings" />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </BrowserRouter>
+      <AuthContext.Provider
+        value={{ currentUser, onSignOut: handleSignOut, updateCurrentUser: setCurrentUser }}
+      >
+        <UserProgressProvider
+          key={authSessionKey}
+          currentUser={currentUser}
+          onSyncUser={setCurrentUser}
+          onProgressMutated={handleProgressMutated}
+        >
+          <BrowserRouter>
+            <Routes>
+              <Route path="/sidebar" element={<SidebarPreviewPage currentUser={currentUser} />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/missions/:id" element={<MissionPage />} />
+              <Route path="/terminal" element={<Navigate to="/missions/1" replace />} />
+              <Route path="/badges" element={<Placeholder title="Badges" />} />
+              <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
+              <Route path="/ranking" element={<Placeholder title="Leaderboard" />} />
+              <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
+              <Route
+                path="/profile"
+                element={
+                  <AppShell>
+                    <div className={styles.placeholder}>
+                      <span className={styles.placeholderOverline}>Active Session</span>
+                      <h1 className={styles.placeholderTitle}>
+                        {formatDisplayName(currentUser) || currentUser.email || currentUser.username}
+                      </h1>
+                      <p className={styles.placeholderText}>
+                        {currentUser.email ? `${currentUser.email} · ` : ''}
+                        Authenticated operative ID: <code>UID: {currentUser.id}</code>
+                      </p>
+                      <button
+                        type="button"
+                        className="apple-btn-secondary"
+                        onClick={handleSignOut}
+                        style={{ marginTop: '16px' }}
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </AppShell>
+                }
+              />
+              <Route path="/settings" element={<Placeholder title="Settings" />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </UserProgressProvider>
       </AuthContext.Provider>
     );
   }
