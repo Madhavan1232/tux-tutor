@@ -6,7 +6,6 @@ const { generateAndStoreOtp, removeOtpRecord, verifyAndConsumeOtp, COOLDOWN_SECO
 const { sendOtpEmail, sendPasswordResetEmail } = require('../services/emailService');
 const prisma = require('../../db');
 const { recordLoginAttempt, recordSignupSuccess, logger } = require('../utils/logger');
-const { formatDisplayName } = require('../utils/displayName');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -14,12 +13,13 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * Serializes a Prisma User record for auth responses with resolved display name.
  */
 function buildAuthUser(user) {
+  const savedName = user.displayName?.trim() || null;
   return {
     id: user.id,
     username: user.username,
     email: user.email,
-    displayName: user.displayName?.trim() || null,
-    name: formatDisplayName(user),
+    displayName: savedName,
+    name: savedName,
     xp: user.xp,
     level: user.level,
     streak: user.streak,
@@ -291,12 +291,16 @@ async function verifyOtp(req, res) {
 
     // Generate JWT
     const token = signAuthToken(user, '7d');
+    const authUser = buildAuthUser(user);
+    const hasSavedName = Boolean(authUser.name);
 
     return res.status(200).json({
       success: true,
       message: isNewUser ? 'Welcome to Tux Tutor! Account created.' : 'Welcome back! Signed in successfully.',
       token,
-      user: buildAuthUser(user),
+      needsNameSetup: !hasSavedName,
+      redirectTo: hasSavedName ? '/dashboard' : '/onboarding/name',
+      user: authUser,
     });
   } catch (err) {
     console.error('[verifyOtp Error]:', err.message);
@@ -753,12 +757,20 @@ async function handleGoogleAuth(req, res) {
     });
 
     const token = signAuthToken(user, '7d');
+    const authUser = buildAuthUser(user);
+    const googleName = (typeof targetName === 'string' && targetName.trim()) || authUser.name || null;
+    const isNewGoogleUser = Boolean(isNew);
 
     return res.status(200).json({
       success: true,
       token,
       isNew,
-      user: buildAuthUser(user),
+      redirectTo: !authUser.name || isNewGoogleUser ? '/onboarding/name' : '/dashboard',
+      user: {
+        ...authUser,
+        isNewGoogleUser,
+        googleName,
+      },
       message: isNew
         ? 'Account successfully created with Google!'
         : 'Successfully signed in with Google!',
@@ -804,10 +816,18 @@ function handleGoogleCallback(req, res, next) {
       return res.redirect(`${clientBaseUrl}/?auth_error=${msg}`);
     }
 
-    const { user, isNew } = result;
+    const { user, isNew, googleName } = result;
     const token = signAuthToken(user, '7d');
+    const resolvedGoogleName = googleName || user.displayName?.trim() || '';
+    const params = new URLSearchParams({
+      auth_token: token,
+      is_new: String(Boolean(isNew)),
+    });
+    if (isNew && resolvedGoogleName) {
+      params.set('google_name', resolvedGoogleName);
+    }
 
-    return res.redirect(`${clientBaseUrl}/?auth_token=${token}&is_new=${isNew}`);
+    return res.redirect(`${clientBaseUrl}/?${params.toString()}`);
   })(req, res, next);
 }
 

@@ -9,9 +9,7 @@ import WeeklyLeaderboard from './rail/WeeklyLeaderboard';
 import NextWorldProgress from './rail/NextWorldProgress';
 import TuxModel from '../../components/TuxModel';
 import { useDashboardData } from './useDashboardData';
-import { useAuth } from '../../context/AuthContext';
 import { clearStoredAuth } from '../../utils/auth';
-import { formatDisplayName } from '../../utils/user';
 import { RefreshCw, LogIn } from 'lucide-react';
 import styles from './DashboardPage.module.css';
 
@@ -22,7 +20,6 @@ import styles from './DashboardPage.module.css';
  *  Sidebar (via AppShell) | Learning path | Stats rail
  */
 export default function DashboardPage() {
-  const { currentUser } = useAuth();
   const { data, loading, error, refetch } = useDashboardData();
 
   /* ── Loading State ──────────────────────────────────────────────────── */
@@ -105,7 +102,6 @@ export default function DashboardPage() {
 
       <LearningPath
         worlds={data?.worlds ?? []}
-        userName={formatDisplayName(data?.user ?? currentUser)}
       />
     </AppShell>
   );

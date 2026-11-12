@@ -28,6 +28,7 @@ export function UserProgressProvider({
   currentUser,
   onSyncUser,
   onProgressMutated,
+  pauseInitialSync = false,
   children,
 }) {
   const [dashboardData, setDashboardData] = useState(null);
@@ -136,14 +137,14 @@ export function UserProgressProvider({
 
   // Initial sync once authenticated when a token exists (loading already starts true when token exists)
   useEffect(() => {
-    if (getStoredToken()) {
+    if (!pauseInitialSync && getStoredToken()) {
       const timer = setTimeout(() => {
         void refreshUserProgress({ skipInitialLoadingState: true });
       }, 0);
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [refreshUserProgress]);
+  }, [pauseInitialSync, refreshUserProgress]);
 
   const refreshIfStale = useCallback(
     async (maxAgeMs = 5000) => {

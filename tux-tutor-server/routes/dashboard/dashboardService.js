@@ -185,9 +185,11 @@ async function getDashboardData(userId) {
   const leaderboardUserIds = weeklyXpRaw.map((r) => r.userId);
   const leaderboardUsers = await prisma.user.findMany({
     where: { id: { in: leaderboardUserIds } },
-    select: { id: true, username: true },
+    select: { id: true, username: true, displayName: true },
   });
-  const userMap = Object.fromEntries(leaderboardUsers.map((u) => [u.id, u.username]));
+  const userMap = Object.fromEntries(
+    leaderboardUsers.map((u) => [u.id, formatDisplayName(u) || u.username])
+  );
 
   let leaderboard = weeklyXpRaw.map((r, idx) => ({
     rank: idx + 1,
@@ -204,7 +206,7 @@ async function getDashboardData(userId) {
     });
     leaderboard.push({
       rank: leaderboard.length + 1,
-      username: user.username,
+      username: formatDisplayName(user) || user.username,
       weeklyXp: myWeeklyXp._sum.amount ?? 0,
       isCurrentUser: true,
     });
@@ -233,12 +235,12 @@ async function getDashboardData(userId) {
   // XP to next level (simple formula: 500 * level * 1.15)
   const xpToNext = Math.round(500 * user.level * Math.pow(1.15, user.level - 1));
 
-  const formattedName = formatDisplayName(user);
+  const savedName = user.displayName?.trim() || null;
 
   return {
     user: {
-      name: formattedName,
-      displayName: user.displayName?.trim() || formattedName,
+      name: savedName,
+      displayName: savedName,
       username: user.username,
       email: user.email,
       level: user.level,

@@ -222,6 +222,8 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
             const params = new URLSearchParams(window.location.search)
             const token = params.get("auth_token") || params.get("token")
             const authError = params.get("auth_error") || params.get("error")
+            const isNewGoogle = params.get("is_new") === "true"
+            const googleNameParam = params.get("google_name")?.trim() || null
 
             if (token) {
                 setIsSuccess(true)
@@ -233,7 +235,13 @@ export default function AuthPage({ onAuthSuccess, initialEmail = "", initialNoti
                     .then((data) => {
                         if (data.user) {
                             window.history.replaceState({}, document.title, window.location.pathname)
-                            onAuthSuccess(data.user)
+                            const resolvedGoogleName =
+                                googleNameParam || data.user.displayName || data.user.name || null
+                            onAuthSuccess({
+                                ...data.user,
+                                isNewGoogleUser: isNewGoogle && Boolean(resolvedGoogleName),
+                                googleName: resolvedGoogleName,
+                            })
                         } else {
                             throw new Error("User session not found")
                         }

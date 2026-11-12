@@ -1,4 +1,43 @@
 /**
+ * Returns true if the user has an explicitly saved display name (not just fallback email/username).
+ */
+export function hasSavedName(user) {
+  if (!user) return false;
+  const savedDisplay = typeof user.displayName === 'string' ? user.displayName.trim() : '';
+  const savedDisplaySnake = typeof user.display_name === 'string' ? user.display_name.trim() : '';
+  const savedName =
+    typeof user.name === 'string' && user.name !== user.username ? user.name.trim() : '';
+  const savedFull = typeof user.fullName === 'string' ? user.fullName.trim() : '';
+  return Boolean(savedDisplay || savedDisplaySnake || savedName || savedFull);
+}
+
+/**
+ * Validates and trims the user's chosen display name.
+ * Rules: 2-30 chars after trimming, letters/numbers/spaces/hyphens only.
+ */
+export function validateDisplayName(rawName) {
+  if (typeof rawName !== 'string') {
+    return { valid: false, error: 'Please enter your name.' };
+  }
+
+  const trimmed = rawName.trim();
+  if (!trimmed) {
+    return { valid: false, error: 'Please enter your name.' };
+  }
+  if (trimmed.length < 2) {
+    return { valid: false, error: 'Name must be at least 2 characters.' };
+  }
+  if (trimmed.length > 30) {
+    return { valid: false, error: 'Name must be 30 characters or fewer.' };
+  }
+  if (!/^[\p{L}\p{N} -]+$/u.test(trimmed)) {
+    return { valid: false, error: 'Only letters, numbers, spaces, and hyphens are allowed.' };
+  }
+
+  return { valid: true, value: trimmed };
+}
+
+/**
  * Formats a user's display name according to the priority rules:
  * 1. Saved display name / full name in database or profile (e.g. "Madhavan")
  * 2. Cleaned fallback from the part before '@' in the email, or username:

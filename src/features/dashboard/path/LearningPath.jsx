@@ -1,6 +1,6 @@
 // Icons: lucide-react only — do not mix libraries
 import React, { useState } from 'react';
-import { Navigation } from 'lucide-react';
+import { Route } from 'lucide-react';
 import WorldBanner from './WorldBanner';
 import styles from './LearningPath.module.css';
 
@@ -9,9 +9,8 @@ import styles from './LearningPath.module.css';
  * Maps all worlds to themed, gamified zones with winding snake mission paths.
  *
  * @param {object[]} worlds — array of world objects from /api/dashboard
- * @param {string} userName — current user's display name
  */
-export default function LearningPath({ worlds = [], userName = '' }) {
+export default function LearningPath({ worlds = [] }) {
   // Find current active world (first unlocked world that isn't fully completed)
   const defaultExpandedId = (() => {
     const currentWorld = worlds.find((w) => {
@@ -49,22 +48,19 @@ export default function LearningPath({ worlds = [], userName = '' }) {
 
   return (
     <div className={styles.container}>
-      {/* ── Greeting & Roadmap Summary ─────────────────────────────── */}
+      {/* ── Roadmap Summary ─────────────────────────────────────────── */}
       <div className={styles.headerArea}>
-        <div className={styles.welcomePill}>
-          <Navigation size={13} strokeWidth={2} className={styles.compassIcon} aria-hidden="true" />
+        <div className={styles.pathBreadcrumb} data-testid="path-breadcrumb">
+          <Route size={14} strokeWidth={2.2} className={styles.pathIcon} aria-hidden="true" />
           <span>Linux Mastery Path</span>
         </div>
 
-        <h1 className={styles.greeting}>
-          Welcome back{userName ? `, ${userName}` : ''}.
-        </h1>
-
-        <p className={styles.subtitle}>
-          Master terminal commands, core utilities, and sysadmin skills through interactive mission tracks.
+        <p className={styles.subtitle} data-testid="path-subtitle">
+          Build real Linux skills — one mission at a time.
           {worlds.length > 0 && (
-            <span className={styles.statusSummary}>
-              {' '}· <strong>{completedWorldsCount}</strong> of <strong>{worlds.length}</strong> Worlds Cleared
+            <span className={styles.statusSummary} data-testid="modules-cleared-summary">
+              {' '}· <strong className={styles.clearedCount}>{completedWorldsCount}</strong> of{' '}
+              {worlds.length} Modules Cleared
             </span>
           )}
         </p>

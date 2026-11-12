@@ -1,14 +1,15 @@
 import { Suspense, lazy, useState, useEffect, useRef, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
 import { AuthContext } from './context/AuthContext';
 import { UserProgressProvider } from './context/UserProgressContext';
 import { getStoredToken, clearStoredAuth } from './utils/auth';
-import { formatDisplayName } from './utils/user';
+import { formatDisplayName, hasSavedName } from './utils/user';
 import TuxLoader from './components/TuxLoader';
 import styles from './App.module.css';
 
 const AuthPage = lazy(() => import('./components/auth/AuthPage'));
+const NameSetupPage = lazy(() => import('./components/auth/NameSetupPage'));
 const ResetPasswordPage = lazy(() => import('./components/auth/ResetPasswordPage'));
 const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage'));
 const SidebarPreviewPage = lazy(() => import('./features/sidebar-preview/SidebarPreviewPage'));
@@ -34,7 +35,9 @@ function Placeholder({ title }) {
 /**
  * Root Application Router with Authentication & Protected Learning Dashboard.
  */
-export default function App() {
+function AppContent() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isInitializing, setIsInitializing] = useState(true);
   const [showLoader, setShowLoader] = useState(true);
   const [currentUser, setCurrentUser] = useState(() => {
@@ -68,6 +71,7 @@ export default function App() {
   const [authNotice, setAuthNotice] = useState('');
   const [prefilledEmail, setPrefilledEmail] = useState('');
   const [authSessionKey, setAuthSessionKey] = useState(0);
+  const [needsNameOnboarding, setNeedsNameOnboarding] = useState(false);
   const hasLocalProgressMutationRef = useRef(false);
 
   useEffect(() => {
@@ -137,10 +141,31 @@ export default function App() {
     hasLocalProgressMutationRef.current = false;
     setAuthSessionKey((k) => k + 1);
     setCurrentUser(userData);
+
+    if (!hasSavedName(userData)) {
+      setNeedsNameOnboarding(true);
+      navigate('/onboarding/name', { replace: true });
+    } else if (userData?.isNewGoogleUser) {
+      const prefill = (
+        userData.googleName ||
+        userData.displayName ||
+        userData.name ||
+        ''
+      ).trim();
+      setNeedsNameOnboarding(true);
+      navigate('/onboarding/name', {
+        replace: true,
+        state: { prefill },
+      });
+    } else {
+      setNeedsNameOnboarding(false);
+      navigate('/dashboard', { replace: true });
+    }
   };
 
   const handleSignOut = () => {
     hasLocalProgressMutationRef.current = false;
+    setNeedsNameOnboarding(false);
     clearStoredAuth();
     setAuthSessionKey((k) => k + 1);
     setCurrentUser(null);
@@ -178,6 +203,12 @@ export default function App() {
       />
     );
   } else {
+    const userHasName = hasSavedName(currentUser);
+    const hasPrefillState = Boolean(location.state?.prefill);
+    const allowNameSetup = !userHasName || needsNameOnboarding || hasPrefillState;
+    const shouldForceOnboarding = needsNameOnboarding;
+    const isNameSetupRoute = location.pathname === '/onboarding/name' || shouldForceOnboarding;
+
     content = (
       <AuthContext.Provider
         value={{ currentUser, onSignOut: handleSignOut, updateCurrentUser: setCurrentUser }}
@@ -187,47 +218,61 @@ export default function App() {
           currentUser={currentUser}
           onSyncUser={setCurrentUser}
           onProgressMutated={handleProgressMutated}
+          pauseInitialSync={isNameSetupRoute}
         >
-          <BrowserRouter>
-            <Routes>
-              <Route path="/sidebar" element={<SidebarPreviewPage currentUser={currentUser} />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/missions/:id" element={<MissionPage />} />
-              <Route path="/terminal" element={<Navigate to="/missions/1" replace />} />
-              <Route path="/badges" element={<Placeholder title="Badges" />} />
-              <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
-              <Route path="/ranking" element={<Placeholder title="Leaderboard" />} />
-              <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
-              <Route
-                path="/profile"
-                element={
-                  <AppShell>
-                    <div className={styles.placeholder}>
-                      <span className={styles.placeholderOverline}>Active Session</span>
-                      <h1 className={styles.placeholderTitle}>
-                        {formatDisplayName(currentUser) || currentUser.email || currentUser.username}
-                      </h1>
-                      <p className={styles.placeholderText}>
-                        {currentUser.email ? `${currentUser.email} · ` : ''}
-                        Authenticated operative ID: <code>UID: {currentUser.id}</code>
-                      </p>
-                      <button
-                        type="button"
-                        className="apple-btn-secondary"
-                        onClick={handleSignOut}
-                        style={{ marginTop: '16px' }}
-                      >
-                        Sign Out
-                      </button>
-                    </div>
-                  </AppShell>
-                }
-              />
-              <Route path="/settings" element={<Placeholder title="Settings" />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </BrowserRouter>
+          <Routes>
+            <Route
+              path="/onboarding/name"
+              element={
+                allowNameSetup ? (
+                  <NameSetupPage onComplete={() => setNeedsNameOnboarding(false)} />
+                ) : (
+                  <Navigate to="/dashboard" replace />
+                )
+              }
+            />
+            <Route path="/sidebar" element={<SidebarPreviewPage currentUser={currentUser} />} />
+            <Route
+              path="/"
+              element={
+                <Navigate to={shouldForceOnboarding ? '/onboarding/name' : '/dashboard'} replace />
+              }
+            />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/missions/:id" element={<MissionPage />} />
+            <Route path="/terminal" element={<Navigate to="/missions/1" replace />} />
+            <Route path="/badges" element={<Placeholder title="Badges" />} />
+            <Route path="/bosses" element={<Placeholder title="Boss Challenges" />} />
+            <Route path="/ranking" element={<Placeholder title="Leaderboard" />} />
+            <Route path="/leaderboard" element={<Placeholder title="Leaderboard" />} />
+            <Route
+              path="/profile"
+              element={
+                <AppShell>
+                  <div className={styles.placeholder}>
+                    <span className={styles.placeholderOverline}>Active Session</span>
+                    <h1 className={styles.placeholderTitle}>
+                      {formatDisplayName(currentUser) || currentUser.email || currentUser.username}
+                    </h1>
+                    <p className={styles.placeholderText}>
+                      {currentUser.email ? `${currentUser.email} · ` : ''}
+                      Authenticated operative ID: <code>UID: {currentUser.id}</code>
+                    </p>
+                    <button
+                      type="button"
+                      className="apple-btn-secondary"
+                      onClick={handleSignOut}
+                      style={{ marginTop: '16px' }}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </AppShell>
+              }
+            />
+            <Route path="/settings" element={<Placeholder title="Settings" />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
         </UserProgressProvider>
       </AuthContext.Provider>
     );
@@ -245,5 +290,16 @@ export default function App() {
         />
       )}
     </>
+  );
+}
+
+/**
+ * Root Application Router with Authentication & Protected Learning Dashboard.
+ */
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }

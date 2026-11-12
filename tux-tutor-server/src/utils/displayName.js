@@ -48,4 +48,26 @@ function formatDisplayName(user) {
     .join(' ');
 }
 
-module.exports = { formatDisplayName };
+function validateDisplayName(rawName) {
+  if (typeof rawName !== 'string') {
+    return { valid: false, error: 'Please enter your name.' };
+  }
+
+  const trimmed = rawName.trim();
+  if (!trimmed) {
+    return { valid: false, error: 'Please enter your name.' };
+  }
+  if (trimmed.length < 2) {
+    return { valid: false, error: 'Name must be at least 2 characters.' };
+  }
+  if (trimmed.length > 30) {
+    return { valid: false, error: 'Name must be 30 characters or fewer.' };
+  }
+  if (!/^[\p{L}\p{N} -]+$/u.test(trimmed)) {
+    return { valid: false, error: 'Only letters, numbers, spaces, and hyphens are allowed.' };
+  }
+
+  return { valid: true, value: trimmed };
+}
+
+module.exports = { formatDisplayName, validateDisplayName };

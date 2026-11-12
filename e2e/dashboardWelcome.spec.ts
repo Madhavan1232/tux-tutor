@@ -85,8 +85,58 @@ test.describe('Dashboard Welcome Message & Display Name', () => {
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
 
-    const heading = page.getByRole('heading', { level: 1 });
-    await expect(heading).toHaveText('Welcome back, Madhavan.');
+    const sidebar = page.getByRole('complementary', { name: 'Main navigation' });
+    await expect(sidebar.getByTestId('sidebar-welcome')).toHaveCount(0);
+
+    // Main content has no "Welcome back" heading and starts with clean Option A breadcrumb + subtitle
+    await expect(page.getByRole('main').getByText(/Welcome back/i)).toHaveCount(0);
+    const breadcrumb = page.getByTestId('path-breadcrumb');
+    await expect(breadcrumb).toBeVisible();
+    await expect(breadcrumb).toHaveText('Linux Mastery Path');
+    await expect(breadcrumb.locator('svg.lucide-route')).toBeVisible();
+    await expect(breadcrumb.locator('svg.lucide-navigation')).toHaveCount(0);
+
+    const headerStyles = await page.evaluate(() => {
+      const bc = document.querySelector('[data-testid="path-breadcrumb"]');
+      const sub = document.querySelector('[data-testid="path-subtitle"]');
+      const summary = document.querySelector('[data-testid="modules-cleared-summary"]');
+      const countEl = summary?.querySelector('strong');
+      const bcs = bc ? getComputedStyle(bc) : null;
+      const subs = sub ? getComputedStyle(sub) : null;
+      const sums = summary ? getComputedStyle(summary) : null;
+      const cs = countEl ? getComputedStyle(countEl) : null;
+      return {
+        bcFont: bcs?.fontFamily,
+        bcSize: bcs?.fontSize,
+        bcWeight: bcs?.fontWeight,
+        bcColor: bcs?.color,
+        bcTransform: bcs?.textTransform,
+        bcBorderWidth: bcs?.borderTopWidth,
+        bcBg: bcs?.backgroundColor,
+        subSize: subs?.fontSize,
+        subColor: subs?.color,
+        subWeight: subs?.fontWeight,
+        sumColor: sums?.color,
+        countColor: cs?.color,
+      };
+    });
+    expect(headerStyles.bcFont).toContain('Space Grotesk');
+    expect(headerStyles.bcSize).toBe('12px');
+    expect(headerStyles.bcWeight).toBe('600');
+    expect(headerStyles.bcColor).toBe('rgb(240, 180, 41)');
+    expect(headerStyles.bcTransform).toBe('uppercase');
+    expect(headerStyles.bcBorderWidth).toBe('0px');
+    expect(headerStyles.bcBg).toBe('rgba(0, 0, 0, 0)');
+    expect(headerStyles.subSize).toBe('14px');
+    expect(headerStyles.subColor).toBe('rgb(107, 114, 128)');
+    expect(headerStyles.subWeight).toBe('400');
+    expect(headerStyles.sumColor).toBe('rgb(107, 114, 128)');
+    expect(headerStyles.countColor).toBe('rgb(240, 180, 41)');
+
+    await expect(page.getByTestId('path-subtitle')).toContainText(
+      'Build real Linux skills — one mission at a time.'
+    );
+    await expect(page.getByTestId('modules-cleared-summary')).toContainText('0 of 1 Modules Cleared');
     await expect(page.getByTestId('user-name')).toHaveText('Madhavan');
   });
 
@@ -141,8 +191,8 @@ test.describe('Dashboard Welcome Message & Display Name', () => {
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
 
-    const heading = page.getByRole('heading', { level: 1 });
-    await expect(heading).toHaveText('Welcome back, Madhavanvairava.');
+    await expect(page.getByTestId('sidebar-welcome')).toHaveCount(0);
+    await expect(page.getByRole('main').getByText(/Welcome back/i)).toHaveCount(0);
     await expect(page.getByTestId('user-name')).toHaveText('Madhavanvairava');
   });
 

@@ -161,7 +161,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'dummy_google_client_id') {
                 data: updateData,
               });
             }
-            return done(null, { user, isNew: false });
+            return done(null, { user, isNew: false, googleName: googleDisplayName });
           }
 
           // 2. Create new user account automatically using Google profile data
@@ -194,7 +194,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'dummy_google_client_id') {
             ipAddress: 'google-oauth',
           });
 
-          return done(null, { user, isNew: true });
+          return done(null, { user, isNew: true, googleName: googleDisplayName });
         } catch (err) {
           logger.error('Error during Google OAuth strategy execution', { error: err.message });
           return done(err, null);

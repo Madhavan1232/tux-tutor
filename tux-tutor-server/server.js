@@ -5,6 +5,7 @@ const cors = require('cors');
 const passport = require('./src/config/passport');
 const prisma = require('./db');
 const authRoutes = require('./src/routes/authRoutes');
+const userRoutes = require('./src/routes/userRoutes');
 const dashboardRouter = require('./routes/dashboard/dashboardRouter');
 const missionRouter = require('./routes/mission/missionRouter');
 
@@ -45,6 +46,9 @@ app.get('/api/health', async (req, res) => {
 // Authentication Routes (supports both /auth and /api/auth)
 app.use('/auth', authRoutes);
 app.use('/api/auth', authRoutes);
+
+// User Profile Routes
+app.use('/api/user', userRoutes);
 
 // Dashboard Routes
 app.use('/api/dashboard', dashboardRouter);

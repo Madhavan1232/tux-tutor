@@ -13,47 +13,44 @@
   gap: 8px;
 }
 
-.welcomePill {
+.pathBreadcrumb {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   align-self: flex-start;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
-  background-color: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-subtle);
-  padding: 3px 10px;
-  border-radius: 999px;
+  color: #F0B429;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
-.compassIcon {
-  color: var(--color-text-secondary);
-}
-
-.greeting {
-  font-family: var(--font-display);
-  font-size: var(--text-3xl);
-  color: var(--color-text-primary);
-  font-weight: var(--weight-bold);
-  margin: 0;
-  letter-spacing: var(--tracking-tight);
-  line-height: var(--leading-tight);
+.pathIcon {
+  color: #F0B429;
+  flex-shrink: 0;
 }
 
 .subtitle {
   font-family: var(--font-body);
-  font-size: 14.5px;
-  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 400;
+  color: #6B7280;
   margin: 0;
   line-height: 1.5;
 }
 
 .statusSummary {
-  color: var(--color-text-primary);
+  color: #6B7280;
+  font-weight: 400;
+}
+
+.clearedCount {
+  color: #F0B429;
+  font-weight: 600;
 }
 
 .worldList {
