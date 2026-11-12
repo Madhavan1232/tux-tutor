@@ -20,7 +20,7 @@ export function estimateMissionXpReward(baseReward, hintsUsed = 0) {
   else if (safeHints === 2) penaltyMultiplier = 0.6;
   else if (safeHints >= 3) penaltyMultiplier = 0.4;
 
-  return Math.max(10, Math.round((Number(baseReward) || 50) * penaltyMultiplier));
+  return Math.max(10, Math.round((Number(baseReward) || 40) * penaltyMultiplier));
 }
 
 export function mergeDefined(base = {}, patch = {}) {

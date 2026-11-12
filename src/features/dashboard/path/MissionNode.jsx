@@ -20,7 +20,7 @@ import styles from './MissionNode.module.css';
  */
 export default function MissionNode({ mission, theme, index = 0, style }) {
   const navigate = useNavigate();
-  const { title, status, xpReward = 50 } = mission;
+  const { title, status, xpReward = 40 } = mission;
   const isCurrent = status === 'current';
   const isCompleted = status === 'completed';
   const isLocked = status === 'locked';
