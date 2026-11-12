@@ -56,7 +56,7 @@ model Mission {
   worldId           Int?          @map("world_id")
   orderIndex        Int           @default(0) @map("order_index")
   type              MissionType   @default(mission)
-  xpReward          Int           @default(50) @map("xp_reward")
+  xpReward          Int           @default(40) @map("xp_reward")
   command           String
   expectedOutput    String
   createdAt         DateTime      @default(now())
