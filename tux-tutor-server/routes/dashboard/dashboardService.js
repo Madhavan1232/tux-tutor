@@ -57,6 +57,7 @@ async function getDashboardData(userId) {
     select: {
       username: true,
       email: true,
+      displayName: true,
       level: true,
       xp: true,
       streakCurrent: true,
