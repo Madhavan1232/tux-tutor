@@ -1,13 +1,34 @@
 // Icons: lucide-react only — do not mix libraries
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Lock, ChevronDown, Check, Route } from 'lucide-react';
+import { Lock, ChevronDown, Check, Route, BookOpen } from 'lucide-react';
 import TuxModel from '../../../components/TuxModel';
 import MissionNode from './MissionNode';
 import BossNode from './BossNode';
 import SnakePathSvg from './SnakePathSvg';
 import { getWorldTheme } from './worldThemes';
 import styles from './WorldBanner.module.css';
+
+// Map world orderIndex → bundled PDF asset
+import pdf01 from '../../../assets/learning_materials/Module_01_Linux_Basics.pdf';
+import pdf02 from '../../../assets/learning_materials/Module_02_Files_and_Directories.pdf';
+import pdf03 from '../../../assets/learning_materials/Module_03_Text_Processing.pdf';
+import pdf04 from '../../../assets/learning_materials/Module_04_Permissions.pdf';
+import pdf05 from '../../../assets/learning_materials/Module_05_Processes.pdf';
+import pdf06 from '../../../assets/learning_materials/Module_06_Networking.pdf';
+import pdf07 from '../../../assets/learning_materials/Module_07_Shell_Scripting.pdf';
+import pdf08 from '../../../assets/learning_materials/Module_08_System_Administration.pdf';
+
+const WORLD_PDFS = {
+  1: pdf01,
+  2: pdf02,
+  3: pdf03,
+  4: pdf04,
+  5: pdf05,
+  6: pdf06,
+  7: pdf07,
+  8: pdf08,
+};
 
 /**
  * WorldBanner — A themed World zone containing an organic snake learning path.
@@ -36,6 +57,15 @@ export default function WorldBanner({ world, isExpanded, onToggle }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const pdfUrl = WORLD_PDFS[orderIndex] ?? null;
+
+  const handleOpenPdf = (e) => {
+    e.stopPropagation(); // prevent toggling the world banner
+    if (pdfUrl) {
+      window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   // Determine world completion state
   const allMissionsDone = missions.length > 0 && missions.every((m) => m.status === 'completed');
@@ -130,6 +160,20 @@ export default function WorldBanner({ world, isExpanded, onToggle }) {
                 <Check size={11} strokeWidth={2.5} aria-hidden="true" />
                 Cleared
               </span>
+            )}
+
+            {/* Study Material PDF button — shown for all worlds */}
+            {pdfUrl && (
+              <button
+                type="button"
+                className={styles.pdfBtn}
+                onClick={handleOpenPdf}
+                aria-label={`Open study material for ${name}`}
+                title="Open Study Material PDF"
+              >
+                <BookOpen size={12} strokeWidth={2.5} aria-hidden="true" />
+                Study Material
+              </button>
             )}
           </div>
 
